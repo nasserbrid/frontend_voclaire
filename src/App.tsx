@@ -1,5 +1,5 @@
-import SttForm from './components/SttForm'
+import LandingPage from './components/LandingPage'
 
 export default function App() {
-  return <SttForm />
+  return <LandingPage />
 }

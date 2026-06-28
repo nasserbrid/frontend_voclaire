@@ -1,1 +1,8 @@
 @import "tailwindcss";
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; }
+
+@keyframes vc-spin { to { transform: rotate(360deg); } }
+@keyframes vc-fadeup { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }

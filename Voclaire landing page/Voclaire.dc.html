@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; }
+    ::selection { background: rgba(16,185,129,0.4); color: #fff; }
+    @keyframes vc-spin { to { transform: rotate(360deg); } }
+    @keyframes vc-pulse { 0%,100% { opacity:1; } 50% { opacity:0.35; } }
+    @keyframes vc-fadeup { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform:none; } }
+    @keyframes vc-bar { 0%,100% { transform: scaleY(0.35); } 50% { transform: scaleY(1); } }
+  </style>
+</helmet>
+<div style="background:#030712; color:#e5e7eb; font-family:'Manrope',sans-serif; min-height:100vh; overflow-x:hidden; position:relative;">
+
+  <!-- ambient glow -->
+  <div style="position:absolute; top:-220px; left:50%; transform:translateX(-50%); width:900px; height:600px; background:radial-gradient(ellipse at center, rgba(16,185,129,0.22), transparent 60%); pointer-events:none; filter:blur(20px); z-index:0;"></div>
+
+  <!-- NAV -->
+  <nav style="position:sticky; top:0; z-index:50; backdrop-filter:blur(12px); background:rgba(3,7,18,0.72); border-bottom:1px solid rgba(255,255,255,0.06);">
+    <div style="max-width:1140px; margin:0 auto; padding:16px 24px; display:flex; align-items:center; justify-content:space-between;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <div style="width:30px; height:30px; border-radius:9px; background:linear-gradient(140deg,#10b981,#34d399); display:flex; align-items:center; justify-content:center; box-shadow:0 4px 16px rgba(16,185,129,0.4);">
+          <div style="width:8px; height:14px; background:#fff; border-radius:4px;"></div>
+        </div>
+        <span style="font-family:'Sora',sans-serif; font-weight:700; font-size:19px; letter-spacing:-0.02em; color:#fff;">voclaire</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:28px;">
+        <a href="#features" style="display:none; color:#9ca3af; text-decoration:none; font-size:14.5px; font-weight:500;">Fonctionnalités</a>
+        <a href="#pricing" style="color:#9ca3af; text-decoration:none; font-size:14.5px; font-weight:500;">Tarifs</a>
+        <a href="#demo" onClick="{{ scrollToDemo }}" style="background:#10b981; color:#fff; text-decoration:none; padding:9px 18px; border-radius:10px; font-size:14.5px; font-weight:600; box-shadow:0 4px 14px rgba(16,185,129,0.35);">Essayer gratuitement</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section style="position:relative; z-index:1; max-width:880px; margin:0 auto; padding:96px 24px 60px; text-align:center;">
+    <h1 style="font-family:'Sora',sans-serif; font-weight:800; font-size:60px; line-height:1.04; letter-spacing:-0.03em; color:#fff; margin:0 0 22px; text-wrap:balance;">
+      Votre audio en texte,<br><span style="background:linear-gradient(120deg,#34d399,#10b981); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;">en quelques secondes.</span>
+    </h1>
+    <p style="font-size:19px; line-height:1.6; color:#9ca3af; max-width:560px; margin:0 auto 38px; font-weight:500;">
+      Déposez un fichier audio, obtenez une transcription précise instantanément. Sans compte, sans installation. Corrigez et reformulez ensuite avec l'IA.
+    </p>
+    <div style="display:flex; gap:14px; justify-content:center; align-items:center; flex-wrap:wrap;">
+      <a href="#demo" onClick="{{ scrollToDemo }}" style="background:#10b981; color:#fff; text-decoration:none; padding:15px 30px; border-radius:12px; font-size:16px; font-weight:700; box-shadow:0 8px 28px rgba(16,185,129,0.45); display:inline-flex; align-items:center; gap:9px;">
+        Essayer maintenant
+        <span style="font-size:18px; line-height:1;">↓</span>
+      </a>
+      <a href="#pricing" style="color:#e5e7eb; text-decoration:none; padding:15px 24px; border-radius:12px; font-size:16px; font-weight:600; border:1px solid rgba(255,255,255,0.12);">Voir les tarifs</a>
+    </div>
+    <p style="font-size:13.5px; color:#6b7280; margin-top:22px; font-weight:500;">Aucune carte bancaire requise · Premier essai gratuit en bas de page</p>
+  </section>
+
+  <!-- DEMO -->
+  <section id="demo" ref="{{ demoRef }}" style="position:relative; z-index:1; max-width:760px; margin:0 auto; padding:40px 24px 90px;">
+    <div style="text-align:center; margin-bottom:30px;">
+      <div style="font-size:13px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#34d399; margin-bottom:12px;">Démo en direct</div>
+      <h2 style="font-family:'Sora',sans-serif; font-weight:700; font-size:34px; letter-spacing:-0.02em; color:#fff; margin:0 0 10px;">Testez-le tout de suite</h2>
+      <p style="color:#9ca3af; font-size:16px; margin:0; font-weight:500;">Déposez un fichier audio. La transcription s'affiche ici même.</p>
+    </div>
+
+    <div style="background:linear-gradient(180deg,#0b1020,#080b16); border:1px solid rgba(255,255,255,0.08); border-radius:20px; padding:28px; box-shadow:0 24px 60px rgba(0,0,0,0.5);">
+
+      <!-- dropzone -->
+      <label for="vc-file" onDragOver="{{ onDragOver }}" onDragLeave="{{ onDragLeave }}" onDrop="{{ onDrop }}" style="{{ dropStyle }}">
+        <input id="vc-file" type="file" accept="audio/*" onChange="{{ onFileChange }}" style="display:none;">
+        <div style="width:48px; height:48px; border-radius:14px; background:rgba(16,185,129,0.16); border:1px solid rgba(16,185,129,0.35); display:flex; align-items:center; justify-content:center; margin:0 auto 14px;">
+          <div style="display:flex; align-items:flex-end; gap:3px; height:20px;">
+            <span style="width:3px; height:8px; background:#34d399; border-radius:2px; display:block;"></span>
+            <span style="width:3px; height:16px; background:#34d399; border-radius:2px; display:block;"></span>
+            <span style="width:3px; height:11px; background:#34d399; border-radius:2px; display:block;"></span>
+            <span style="width:3px; height:18px; background:#34d399; border-radius:2px; display:block;"></span>
+            <span style="width:3px; height:7px; background:#34d399; border-radius:2px; display:block;"></span>
+          </div>
+        </div>
+        <div style="font-weight:700; font-size:16px; color:#fff; margin-bottom:5px;">{{ fileLabel }}</div>
+        <div style="font-size:14px; color:#9ca3af; font-weight:500;">{{ fileSubLabel }}</div>
+      </label>
+
+      <button onClick="{{ onTranscribe }}" disabled="{{ btnDisabled }}" style="{{ btnStyle }}">
+        <sc-if value="{{ loading }}" hint-placeholder-val="{{ false }}">
+          <span style="width:16px; height:16px; border:2px solid rgba(255,255,255,0.4); border-top-color:#fff; border-radius:999px; display:inline-block; animation:vc-spin 0.7s linear infinite;"></span>
+        </sc-if>
+        {{ btnLabel }}
+      </button>
+
+      <sc-if value="{{ error }}" hint-placeholder-val="">
+        <div style="margin-top:14px; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); color:#fca5a5; padding:12px 16px; border-radius:12px; font-size:14px; font-weight:500;">{{ error }}</div>
+      </sc-if>
+
+      <sc-if value="{{ result }}" hint-placeholder-val="">
+        <div style="margin-top:22px; animation:vc-fadeup 0.4s ease;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="width:7px; height:7px; border-radius:999px; background:#22c55e; display:inline-block;"></span>
+              <span style="font-size:13px; font-weight:700; color:#e5e7eb; letter-spacing:0.02em;">Transcription</span>
+              <span style="font-size:12px; color:#6b7280; font-weight:600;">{{ resultMeta }}</span>
+            </div>
+            <button onClick="{{ onCopy }}" style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); color:#6ee7b7; padding:6px 12px; border-radius:9px; font-size:12.5px; font-weight:600; cursor:pointer;">{{ copyLabel }}</button>
+          </div>
+          <div style="background:#05070f; border:1px solid rgba(255,255,255,0.07); border-radius:14px; padding:18px 20px; font-size:15.5px; line-height:1.7; color:#d1d5db; font-weight:500; white-space:pre-wrap;">{{ result }}</div>
+          <div style="margin-top:16px; display:flex; align-items:center; gap:12px; background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.22); border-radius:14px; padding:14px 18px;">
+            <div style="flex:1;">
+              <div style="font-weight:700; font-size:14.5px; color:#fff; margin-bottom:2px;">Affiner avec l'IA <span style="font-size:11px; background:#10b981; color:#fff; padding:2px 7px; border-radius:6px; vertical-align:middle; margin-left:4px;">Pro</span></div>
+              <div style="font-size:13.5px; color:#9ca3af; font-weight:500;">Corrigez la ponctuation, reformulez, structurez automatiquement.</div>
+            </div>
+            <a href="#cta" style="background:#10b981; color:#fff; text-decoration:none; padding:9px 16px; border-radius:10px; font-size:13.5px; font-weight:700; white-space:nowrap;">Débloquer</a>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section style="position:relative; z-index:1; max-width:1040px; margin:0 auto; padding:50px 24px;">
+    <div style="text-align:center; margin-bottom:46px;">
+      <h2 style="font-family:'Sora',sans-serif; font-weight:700; font-size:34px; letter-spacing:-0.02em; color:#fff; margin:0 0 10px;">Comment ça marche</h2>
+      <p style="color:#9ca3af; font-size:16px; margin:0; font-weight:500;">Trois étapes, zéro friction.</p>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:20px;">
+      <sc-for list="{{ steps }}" as="step" hint-placeholder-count="3">
+        <div style="background:linear-gradient(180deg,rgba(255,255,255,0.03),transparent); border:1px solid rgba(255,255,255,0.07); border-radius:18px; padding:28px 24px;">
+          <div style="font-family:'Sora',sans-serif; font-size:14px; font-weight:700; color:#10b981; margin-bottom:18px;">{{ step.num }}</div>
+          <div style="font-family:'Sora',sans-serif; font-weight:600; font-size:19px; color:#fff; margin-bottom:8px;">{{ step.title }}</div>
+          <div style="font-size:14.5px; line-height:1.6; color:#9ca3af; font-weight:500;">{{ step.body }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="features" style="position:relative; z-index:1; max-width:1040px; margin:0 auto; padding:50px 24px;">
+    <div style="text-align:center; margin-bottom:46px;">
+      <h2 style="font-family:'Sora',sans-serif; font-weight:700; font-size:34px; letter-spacing:-0.02em; color:#fff; margin:0 0 10px;">Gratuit vs Pro</h2>
+      <p style="color:#9ca3af; font-size:16px; margin:0; font-weight:500;">Commencez gratuitement. Passez au niveau supérieur quand vous en avez besoin.</p>
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+      <div style="background:rgba(255,255,255,0.025); border:1px solid rgba(255,255,255,0.08); border-radius:20px; padding:30px;">
+        <div style="font-family:'Sora',sans-serif; font-weight:700; font-size:20px; color:#fff; margin-bottom:6px;">Transcription</div>
+        <div style="font-size:13.5px; color:#9ca3af; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:22px;">Gratuit</div>
+        <sc-for list="{{ freeFeatures }}" as="f" hint-placeholder-count="4">
+          <div style="display:flex; align-items:flex-start; gap:11px; padding:9px 0; border-top:1px solid rgba(255,255,255,0.05);">
+            <span style="color:#22c55e; font-size:15px; margin-top:1px;">✓</span>
+            <span style="font-size:15px; color:#d1d5db; font-weight:500;">{{ f }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="background:linear-gradient(180deg,rgba(16,185,129,0.14),rgba(16,185,129,0.04)); border:1px solid rgba(16,185,129,0.4); border-radius:20px; padding:30px; position:relative;">
+        <div style="font-family:'Sora',sans-serif; font-weight:700; font-size:20px; color:#fff; margin-bottom:6px;">Post-traitement IA</div>
+        <div style="font-size:13.5px; color:#6ee7b7; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:22px;">Pro</div>
+        <sc-for list="{{ proFeatures }}" as="f" hint-placeholder-count="4">
+          <div style="display:flex; align-items:flex-start; gap:11px; padding:9px 0; border-top:1px solid rgba(16,185,129,0.18);">
+            <span style="color:#34d399; font-size:15px; margin-top:1px;">✦</span>
+            <span style="font-size:15px; color:#d1fae5; font-weight:500;">{{ f }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section id="pricing" style="position:relative; z-index:1; max-width:920px; margin:0 auto; padding:50px 24px;">
+    <div style="text-align:center; margin-bottom:46px;">
+      <h2 style="font-family:'Sora',sans-serif; font-weight:700; font-size:34px; letter-spacing:-0.02em; color:#fff; margin:0 0 10px;">Tarifs simples</h2>
+      <p style="color:#9ca3af; font-size:16px; margin:0; font-weight:500;">Sans engagement. Annulez à tout moment.</p>
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:stretch;">
+      <div style="background:rgba(255,255,255,0.025); border:1px solid rgba(255,255,255,0.08); border-radius:22px; padding:34px; display:flex; flex-direction:column;">
+        <div style="font-family:'Sora',sans-serif; font-weight:700; font-size:21px; color:#fff;">Free</div>
+        <div style="margin:18px 0 6px; display:flex; align-items:baseline; gap:6px;"><span style="font-family:'Sora',sans-serif; font-size:46px; font-weight:800; color:#fff; letter-spacing:-0.03em;">0€</span><span style="color:#9ca3af; font-size:15px; font-weight:600;">/ pour toujours</span></div>
+        <div style="font-size:14.5px; color:#9ca3af; margin-bottom:24px; font-weight:500;">Pour transcrire ponctuellement.</div>
+        <div style="flex:1;">
+          <sc-for list="{{ freePlan }}" as="f" hint-placeholder-count="3">
+            <div style="display:flex; align-items:flex-start; gap:10px; padding:7px 0;"><span style="color:#22c55e;">✓</span><span style="font-size:14.5px; color:#d1d5db; font-weight:500;">{{ f }}</span></div>
+          </sc-for>
+        </div>
+        <a href="#cta" style="margin-top:24px; text-align:center; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); color:#fff; text-decoration:none; padding:13px; border-radius:12px; font-weight:700; font-size:15px;">Commencer gratuitement</a>
+      </div>
+      <div style="background:linear-gradient(180deg,rgba(16,185,129,0.16),rgba(16,185,129,0.04)); border:1px solid rgba(16,185,129,0.45); border-radius:22px; padding:34px; display:flex; flex-direction:column; position:relative; box-shadow:0 20px 50px rgba(16,185,129,0.18);">
+        <div style="position:absolute; top:-12px; left:34px; background:#10b981; color:#fff; font-size:12px; font-weight:700; padding:5px 12px; border-radius:999px; letter-spacing:0.03em;">Populaire</div>
+        <div style="font-family:'Sora',sans-serif; font-weight:700; font-size:21px; color:#fff;">Pro</div>
+        <div style="margin:18px 0 6px; display:flex; align-items:baseline; gap:6px;"><span style="font-family:'Sora',sans-serif; font-size:46px; font-weight:800; color:#fff; letter-spacing:-0.03em;">12€</span><span style="color:#6ee7b7; font-size:15px; font-weight:600;">/ mois</span></div>
+        <div style="font-size:14.5px; color:#6ee7b7; margin-bottom:24px; font-weight:500;">Pour transcrire et affiner au quotidien.</div>
+        <div style="flex:1;">
+          <sc-for list="{{ proPlan }}" as="f" hint-placeholder-count="4">
+            <div style="display:flex; align-items:flex-start; gap:10px; padding:7px 0;"><span style="color:#34d399;">✦</span><span style="font-size:14.5px; color:#d1fae5; font-weight:500;">{{ f }}</span></div>
+          </sc-for>
+        </div>
+        <a href="#cta" style="margin-top:24px; text-align:center; background:#10b981; color:#fff; text-decoration:none; padding:13px; border-radius:12px; font-weight:700; font-size:15px; box-shadow:0 8px 24px rgba(16,185,129,0.4);">Passer au Pro</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section id="cta" style="position:relative; z-index:1; max-width:1040px; margin:60px auto 0; padding:0 24px 90px;">
+    <div style="position:relative; overflow:hidden; background:linear-gradient(140deg,#08160f,#04100a); border:1px solid rgba(16,185,129,0.35); border-radius:26px; padding:64px 40px; text-align:center;">
+      <div style="position:absolute; bottom:-160px; left:50%; transform:translateX(-50%); width:700px; height:400px; background:radial-gradient(ellipse at center, rgba(16,185,129,0.3), transparent 65%); pointer-events:none;"></div>
+      <div style="position:relative;">
+        <h2 style="font-family:'Sora',sans-serif; font-weight:800; font-size:42px; letter-spacing:-0.03em; color:#fff; margin:0 0 16px; text-wrap:balance;">Créez votre compte gratuit</h2>
+        <p style="font-size:18px; color:#6ee7b7; max-width:520px; margin:0 auto 34px; font-weight:500; line-height:1.55;">Sauvegardez vos transcriptions, retrouvez votre historique et débloquez le post-traitement IA.</p>
+        <a href="#" style="background:#10b981; color:#fff; text-decoration:none; padding:16px 36px; border-radius:13px; font-size:17px; font-weight:700; box-shadow:0 10px 32px rgba(16,185,129,0.5); display:inline-block;">Créer un compte gratuit</a>
+        <p style="font-size:13.5px; color:#8b8fa3; margin-top:20px; font-weight:500;">Gratuit pour toujours · Sans carte bancaire</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer style="position:relative; z-index:1; border-top:1px solid rgba(255,255,255,0.06);">
+    <div style="max-width:1040px; margin:0 auto; padding:28px 24px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+      <div style="display:flex; align-items:center; gap:9px;">
+        <div style="width:22px; height:22px; border-radius:7px; background:linear-gradient(140deg,#10b981,#34d399);"></div>
+        <span style="font-family:'Sora',sans-serif; font-weight:700; color:#fff; font-size:15px;">voclaire</span>
+      </div>
+      <div style="font-size:13.5px; color:#6b7280; font-weight:500;">© 2026 voclaire — Transcription audio par IA</div>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { file: null, loading: false, result: "", error: "", dragging: false, copied: false, meta: "" };
+
+  demoRef = (el) => { this._demo = el; };
+
+  scrollToDemo = (e) => {
+    if (e) e.preventDefault();
+    if (this._demo) this._demo.scrollIntoView ? null : null;
+    const el = document.getElementById("demo");
+    if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 20, behavior: "smooth" });
+  };
+
+  onFileChange = (e) => {
+    const f = e.target.files && e.target.files[0];
+    if (f) this.setState({ file: f, error: "", result: "" });
+  };
+  onDragOver = (e) => { e.preventDefault(); this.setState({ dragging: true }); };
+  onDragLeave = (e) => { e.preventDefault(); this.setState({ dragging: false }); };
+  onDrop = (e) => {
+    e.preventDefault();
+    const f = e.dataTransfer.files && e.dataTransfer.files[0];
+    this.setState({ dragging: false });
+    if (f && f.type.startsWith("audio")) this.setState({ file: f, error: "", result: "" });
+    else this.setState({ error: "Merci de déposer un fichier audio." });
+  };
+
+  onTranscribe = async () => {
+    if (!this.state.file || this.state.loading) return;
+    this.setState({ loading: true, error: "", result: "" });
+    const fd = new FormData();
+    fd.append("file", this.state.file);
+    const t0 = Date.now();
+    try {
+      const res = await fetch("/stt", { method: "POST", body: fd });
+      if (!res.ok) throw new Error("api");
+      const data = await res.json();
+      const secs = ((Date.now() - t0) / 1000).toFixed(1);
+      this.setState({ loading: false, result: data.text || "", meta: secs + "s" });
+    } catch (err) {
+      // Démo : l'API /stt n'est pas joignable depuis cette page de démonstration.
+      await new Promise(r => setTimeout(r, 1600));
+      const demo = "Bonjour à tous et bienvenue dans cet épisode. Aujourd'hui, on va parler d'un sujet qui revient souvent dans vos questions : comment gagner du temps sur la prise de notes. La transcription automatique change vraiment la donne. Vous enregistrez, vous déposez le fichier, et le texte est prêt en quelques secondes. Plus besoin de réécouter trois fois pour retranscrire un passage.";
+      this.setState({ loading: false, result: demo, meta: "1.6s · démo" });
+    }
+  };
+
+  onCopy = () => {
+    if (this.state.result && navigator.clipboard) navigator.clipboard.writeText(this.state.result);
+    this.setState({ copied: true });
+    setTimeout(() => this.setState({ copied: false }), 1600);
+  };
+
+  renderVals() {
+    const s = this.state;
+    const hasFile = !!s.file;
+    return {
+      scrollToDemo: this.scrollToDemo,
+      demoRef: this.demoRef,
+      onFileChange: this.onFileChange,
+      onDragOver: this.onDragOver,
+      onDragLeave: this.onDragLeave,
+      onDrop: this.onDrop,
+      onTranscribe: this.onTranscribe,
+      onCopy: this.onCopy,
+      loading: s.loading,
+      result: s.result,
+      error: s.error,
+      resultMeta: s.meta ? "· " + s.meta : "",
+      copyLabel: s.copied ? "Copié ✓" : "Copier",
+      fileLabel: hasFile ? s.file.name : (s.dragging ? "Déposez le fichier ici" : "Déposez un fichier audio"),
+      fileSubLabel: hasFile ? (Math.round(s.file.size / 1024) + " Ko · prêt à transcrire") : "ou cliquez pour parcourir · MP3, WAV, M4A…",
+      btnLabel: s.loading ? "Transcription en cours…" : "Transcrire",
+      btnDisabled: !hasFile || s.loading,
+      btnStyle: "margin-top:18px; width:100%; display:flex; align-items:center; justify-content:center; gap:10px; padding:15px; border-radius:13px; border:none; font-family:'Manrope',sans-serif; font-size:16px; font-weight:700; cursor:" + (!hasFile || s.loading ? "not-allowed" : "pointer") + "; background:" + (!hasFile || s.loading ? "rgba(16,185,129,0.4)" : "#10b981") + "; color:#fff; transition:background 0.2s; box-shadow:" + (!hasFile || s.loading ? "none" : "0 8px 24px rgba(16,185,129,0.4)") + ";",
+      dropStyle: "display:block; text-align:center; padding:34px 24px; border-radius:16px; border:1.5px dashed " + (s.dragging ? "#34d399" : "rgba(16,185,129,0.4)") + "; background:" + (s.dragging ? "rgba(16,185,129,0.1)" : "rgba(16,185,129,0.04)") + "; cursor:pointer; transition:all 0.2s;",
+      steps: [
+        { num: "01", title: "Déposez votre audio", body: "Glissez un fichier MP3, WAV ou M4A. Aucun compte, aucune installation." },
+        { num: "02", title: "L'IA transcrit", body: "Le modèle Whisper convertit la parole en texte avec une grande précision, en français." },
+        { num: "03", title: "Récupérez le texte", body: "Copiez, exportez, ou affinez le résultat avec le post-traitement IA." }
+      ],
+      freeFeatures: [
+        "Transcription audio illimitée en test",
+        "Modèle Whisper haute précision",
+        "Détection automatique de la langue",
+        "Copier / coller instantané"
+      ],
+      proFeatures: [
+        "Correction de la ponctuation et des fautes",
+        "Reformulation et structuration du texte",
+        "Résumé automatique de l'enregistrement",
+        "Export en plusieurs formats : Word, PowerPoint, PDF",
+        "Historique et sauvegarde des transcriptions"
+      ],
+      freePlan: [
+        "Transcription IA",
+        "Fichiers jusqu'à 25 Mo",
+        "Export texte brut"
+      ],
+      proPlan: [
+        "Tout du plan Free",
+        "Post-traitement IA (correction, reformulation)",
+        "Fichiers longue durée",
+        "Historique illimité & sauvegarde"
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
