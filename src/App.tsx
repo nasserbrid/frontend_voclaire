@@ -1,5 +1,5 @@
-import TtsForm from './components/TtsForm'
+import SttForm from './components/SttForm'
 
 export default function App() {
-  return <TtsForm />
+  return <SttForm />
 }
