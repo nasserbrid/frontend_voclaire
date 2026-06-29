@@ -29,3 +29,12 @@ export async function getTranscriptions(): Promise<TranscriptionOut[]> {
 
   return res.json()
 }
+
+export async function deleteTranscription(id: string): Promise<void> {
+  const res = await fetch(`${BASE}/transcriptions/${id}`, {
+    method: 'DELETE',
+    credentials: 'include',
+  })
+
+  if (!res.ok) throw new Error(`Erreur ${res.status}`)
+}

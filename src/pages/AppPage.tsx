@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import SttForm from '../components/SttForm'
-import { getTranscriptions } from '../api/transcriptions'
+import { getTranscriptions, deleteTranscription } from '../api/transcriptions'
 import type { TranscriptionOut } from '../types/transcription'
 
 export default function AppPage() {
@@ -29,6 +29,16 @@ export default function AppPage() {
   async function handleLogout() {
     await logout()
     navigate('/')
+  }
+
+  async function handleDelete(id: string) {
+    const previous = history
+    setHistory((h) => h.filter((t) => t.id !== id))
+    try {
+      await deleteTranscription(id)
+    } catch {
+      setHistory(previous)
+    }
   }
 
   return (
@@ -95,9 +105,19 @@ export default function AppPage() {
                     <span style={{ fontSize: '13px', fontWeight: 700, color: '#e5e7eb', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '60%' }}>
                       {t.file_name}
                     </span>
-                    <span style={{ fontSize: '12px', color: '#6b7280', fontWeight: 500, flexShrink: 0 }}>
-                      {new Date(t.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}
-                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
+                      <span style={{ fontSize: '12px', color: '#6b7280', fontWeight: 500 }}>
+                        {new Date(t.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}
+                      </span>
+                      <button
+                        onClick={() => handleDelete(t.id)}
+                        style={{ fontSize: '12px', color: '#6b7280', background: 'transparent', border: '1px solid rgba(255,255,255,0.08)', padding: '4px 10px', borderRadius: '8px', cursor: 'pointer', fontFamily: "'Manrope', sans-serif", fontWeight: 500, transition: 'color 0.15s, border-color 0.15s' }}
+                        onMouseEnter={(e) => { e.currentTarget.style.color = '#f87171'; e.currentTarget.style.borderColor = 'rgba(248,113,113,0.3)' }}
+                        onMouseLeave={(e) => { e.currentTarget.style.color = '#6b7280'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)' }}
+                      >
+                        Supprimer
+                      </button>
+                    </div>
                   </div>
                   <p style={{ fontSize: '14px', color: '#9ca3af', margin: 0, lineHeight: 1.6, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
                     {t.text}
