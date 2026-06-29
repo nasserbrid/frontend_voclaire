@@ -83,7 +83,10 @@ export default function AppPage() {
               <p style={{ fontSize: '12px', color: '#6b7280', fontWeight: 600, margin: 0, textTransform: 'capitalize' }}>
                 Plan {user?.plan}
                 {user?.plan === 'free' && (
-                  <span style={{ marginLeft: '8px', color: '#34d399', cursor: 'pointer' }}>→ Passer Pro</span>
+                  <button
+                    onClick={() => navigate('/pricing')}
+                    style={{ marginLeft: '8px', color: '#34d399', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', fontFamily: "'Manrope', sans-serif", fontSize: '12px', fontWeight: 600 }}
+                  >→ Passer Pro</button>
                 )}
               </p>
             </div>
@@ -103,6 +106,12 @@ export default function AppPage() {
           <h1 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: '32px', letterSpacing: '-0.02em', color: '#fff', margin: 0 }}>
             Nouvelle transcription
           </h1>
+          {user?.plan === 'pro' && (
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', marginTop: '10px', background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.25)', borderRadius: '20px', padding: '4px 12px' }}>
+              <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981' }} />
+              <span style={{ fontSize: '12px', fontWeight: 600, color: '#34d399', letterSpacing: '0.04em' }}>Modèle fine-tuné actif</span>
+            </div>
+          )}
         </div>
         <div style={{ background: 'linear-gradient(180deg,#0b1020,#080b16)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '28px', boxShadow: '0 24px 60px rgba(0,0,0,0.5)' }}>
           <SttForm />
