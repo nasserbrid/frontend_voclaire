@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import SttForm from '../components/SttForm'
+import { getTranscriptions } from '../api/transcriptions'
+import type { TranscriptionOut } from '../types/transcription'
 
 export default function AppPage() {
   'use no memo'
@@ -11,6 +13,7 @@ export default function AppPage() {
   const [toast, setToast] = useState<string | null>(
     (location.state as { toast?: string } | null)?.toast ?? null
   )
+  const [history, setHistory] = useState<TranscriptionOut[]>([])
 
   useEffect(() => {
     if (!toast) return
@@ -18,6 +21,10 @@ export default function AppPage() {
     const timer = setTimeout(() => setToast(null), 3000)
     return () => clearTimeout(timer)
   }, [toast])
+
+  useEffect(() => {
+    getTranscriptions().then(setHistory).catch(() => setHistory([]))
+  }, [])
 
   async function handleLogout() {
     await logout()
@@ -71,6 +78,35 @@ export default function AppPage() {
         <div style={{ background: 'linear-gradient(180deg,#0b1020,#080b16)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '28px', boxShadow: '0 24px 60px rgba(0,0,0,0.5)' }}>
           <SttForm />
         </div>
+
+        {history.length > 0 && (
+          <div style={{ marginTop: '56px' }}>
+            <div style={{ fontSize: '13px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#34d399', marginBottom: '10px' }}>Historique</div>
+            <h2 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: '22px', letterSpacing: '-0.02em', color: '#fff', margin: '0 0 20px' }}>
+              Transcriptions récentes
+            </h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {history.map((t) => (
+                <div
+                  key={t.id}
+                  style={{ background: 'linear-gradient(180deg,#0b1020,#080b16)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '18px 22px' }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                    <span style={{ fontSize: '13px', fontWeight: 700, color: '#e5e7eb', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '60%' }}>
+                      {t.file_name}
+                    </span>
+                    <span style={{ fontSize: '12px', color: '#6b7280', fontWeight: 500, flexShrink: 0 }}>
+                      {new Date(t.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}
+                    </span>
+                  </div>
+                  <p style={{ fontSize: '14px', color: '#9ca3af', margin: 0, lineHeight: 1.6, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                    {t.text}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </main>
     </div>
   )

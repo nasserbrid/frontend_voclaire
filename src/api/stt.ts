@@ -1,20 +1,16 @@
-import type { STTResponse } from '../types'
-
-const BASE_URL = import.meta.env.VITE_ML_API_URL as string
+const ML_API = import.meta.env.VITE_ML_API_URL
 
 export async function transcribeAudio(file: File): Promise<string> {
-  const formData = new FormData()
-  formData.append('file', file)
+  const body = new FormData()
+  body.append('file', file)
 
-  const response = await fetch(`${BASE_URL}/stt`, {
-    method: 'POST',
-    body: formData,
-  })
+  const res = await fetch(`${ML_API}/stt`, { method: 'POST', body })
 
-  if (!response.ok) {
-    throw new Error(`Erreur API ${response.status}`)
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}))
+    throw new Error(data.detail ?? `Erreur ${res.status}`)
   }
 
-  const data: STTResponse = await response.json()
-  return data.text
+  const json = await res.json()
+  return json.text
 }

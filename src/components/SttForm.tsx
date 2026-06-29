@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { transcribeAudio } from '../api/stt'
+import { transcribeAudio } from '../api/transcriptions'
 
 export default function SttForm() {
   const [file, setFile] = useState<File | null>(null)
@@ -29,8 +29,8 @@ export default function SttForm() {
     setLoading(true); setError(null); setTranscript(null)
     const t0 = Date.now()
     try {
-      const text = await transcribeAudio(file)
-      setTranscript(text)
+      const result = await transcribeAudio(file)
+      setTranscript(result.text)
       setMeta(((Date.now() - t0) / 1000).toFixed(1) + 's')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur lors de la transcription')
