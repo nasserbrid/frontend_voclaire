@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import SttForm from '../components/SttForm'
-import { getTranscriptions, deleteTranscription, improveTranscription } from '../api/transcriptions'
+import { getTranscriptions, deleteTranscription, improveTranscription, exportTranscription, downloadBlob } from '../api/transcriptions'
 import type { TranscriptionOut } from '../types/transcription'
 
 export default function AppPage() {
@@ -17,6 +17,7 @@ export default function AppPage() {
   const [improvingId, setImprovingId] = useState<string | null>(null)
   const [modeMap, setModeMap] = useState<Record<string, string>>({})
   const [errorMap, setErrorMap] = useState<Record<string, string>>({})
+  const [downloadingFormat, setDownloadingFormat] = useState<Record<string, string>>({})
 
   useEffect(() => {
     if (!toast) return
@@ -57,6 +58,20 @@ export default function AppPage() {
       setErrorMap((prev) => ({ ...prev, [id]: msg }))
     } finally {
       setImprovingId(null)
+    }
+  }
+
+  async function handleDownload(id: string, format: 'docx' | 'pdf' | 'pptx', fileName: string) {
+    setDownloadingFormat((prev) => ({ ...prev, [id]: format }))
+    setErrorMap((prev) => ({ ...prev, [id]: '' }))
+    try {
+      const blob = await exportTranscription(id, format)
+      downloadBlob(blob, `${fileName}.${format}`)
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : `Erreur export ${format.toUpperCase()}`
+      setErrorMap((prev) => ({ ...prev, [id]: msg }))
+    } finally {
+      setDownloadingFormat((prev) => ({ ...prev, [id]: '' }))
     }
   }
 
@@ -128,6 +143,7 @@ export default function AppPage() {
                 const isImproving = improvingId === t.id
                 const selectedMode = modeMap[t.id] ?? 'correction'
                 const error = errorMap[t.id] ?? ''
+                const isDownloading = !!downloadingFormat[t.id]
 
                 return (
                   <div
@@ -168,6 +184,30 @@ export default function AppPage() {
                       </div>
                     )}
 
+                    {t.structured_content && (
+                      <div style={{ background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.2)', borderRadius: '10px', padding: '14px', marginTop: '10px' }}>
+                        <div style={{ fontSize: '11px', color: '#34d399', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '10px' }}>
+                          Réunion structurée
+                        </div>
+                        <h3 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: '15px', color: '#d1fae5', margin: '0 0 8px' }}>
+                          {t.structured_content.titre}
+                        </h3>
+                        <p style={{ fontSize: '14px', color: '#a7f3d0', margin: '0 0 10px', lineHeight: 1.6 }}>
+                          {t.structured_content.introduction}
+                        </p>
+                        <ol style={{ margin: '0 0 10px', paddingLeft: '18px' }}>
+                          {t.structured_content.points.map((point, i) => (
+                            <li key={i} style={{ fontSize: '14px', color: '#d1fae5', lineHeight: 1.6, marginBottom: '4px' }}>
+                              {point}
+                            </li>
+                          ))}
+                        </ol>
+                        <p style={{ fontSize: '14px', color: '#a7f3d0', margin: 0, lineHeight: 1.6 }}>
+                          {t.structured_content.conclusion}
+                        </p>
+                      </div>
+                    )}
+
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '14px' }}>
                       <select
                         value={selectedMode}
@@ -177,6 +217,7 @@ export default function AppPage() {
                         <option value="correction">Correction</option>
                         <option value="reformulation">Reformulation</option>
                         <option value="résumé">Résumé</option>
+                        {user?.plan === 'pro' ? <option value="structured_meeting">Réunion structurée</option> : null}
                       </select>
                       <button
                         onClick={() => handleImprove(t.id)}
@@ -185,6 +226,35 @@ export default function AppPage() {
                       >
                         {isImproving ? 'En cours…' : 'Améliorer'}
                       </button>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '10px', flexWrap: 'wrap' }}>
+                      {user?.plan === 'pro' ? (
+                        (['docx', 'pdf', 'pptx'] as const).map((format) => {
+                          const needsStructured = format === 'pdf' || format === 'pptx'
+                          const isDisabledFormat = needsStructured && !t.structured_content
+                          const isFmtDownloading = downloadingFormat[t.id] === format
+                          return (
+                            <button
+                              key={format}
+                              onClick={() => handleDownload(t.id, format, t.file_name)}
+                              disabled={isDisabledFormat || isDownloading}
+                              title={isDisabledFormat ? "Générez d'abord la réunion structurée" : undefined}
+                              style={{ fontSize: '12px', color: isDisabledFormat ? '#4b5563' : '#9ca3af', background: 'transparent', border: `1px solid ${isDisabledFormat ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.12)'}`, borderRadius: '8px', padding: '5px 12px', cursor: isDisabledFormat || isDownloading ? 'not-allowed' : 'pointer', fontFamily: "'Manrope', sans-serif", fontWeight: 500, opacity: isDisabledFormat ? 0.4 : 1 }}
+                            >
+                              {isFmtDownloading ? '…' : format.toUpperCase()}
+                            </button>
+                          )
+                        })
+                      ) : (
+                        <button
+                          onClick={() => handleDownload(t.id, 'docx', t.file_name)}
+                          disabled={isDownloading}
+                          style={{ fontSize: '12px', color: '#9ca3af', background: 'transparent', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '8px', padding: '5px 12px', cursor: isDownloading ? 'not-allowed' : 'pointer', fontFamily: "'Manrope', sans-serif", fontWeight: 500, opacity: isDownloading ? 0.5 : 1 }}
+                        >
+                          {downloadingFormat[t.id] === 'docx' ? '…' : 'Télécharger DOCX'}
+                        </button>
+                      )}
                     </div>
 
                     {error && (

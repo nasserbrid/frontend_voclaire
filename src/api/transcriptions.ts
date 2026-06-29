@@ -54,3 +54,25 @@ export async function deleteTranscription(id: string): Promise<void> {
 
   if (!res.ok) throw new Error(`Erreur ${res.status}`)
 }
+
+export async function exportTranscription(id: string, format: 'docx' | 'pdf' | 'pptx'): Promise<Blob> {
+  const res = await fetch(`${BASE}/transcriptions/${id}/export?format=${format}`, {
+    credentials: 'include',
+  })
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}))
+    throw new Error((data as { detail?: string }).detail ?? `Erreur ${res.status}`)
+  }
+
+  return res.blob()
+}
+
+export function downloadBlob(blob: Blob, filename: string): void {
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename
+  a.click()
+  URL.revokeObjectURL(url)
+}
