@@ -25,48 +25,52 @@ export default function AppPage() {
   }
 
   return (
-    <div className="min-h-screen" style={{ background: '#030712' }}>
+    <div style={{ background: '#030712', color: '#e5e7eb', fontFamily: "'Manrope', sans-serif", minHeight: '100vh' }}>
       {toast && (
-        <div style={{ position: 'fixed', top: 24, left: '50%', transform: 'translateX(-50%)', background: '#10b981', color: '#fff', padding: '14px 28px', borderRadius: 12, fontFamily: 'Manrope, sans-serif', fontSize: 16, fontWeight: 600, boxShadow: '0 4px 24px rgba(0,0,0,0.4)', zIndex: 9999, whiteSpace: 'nowrap' }}>
+        <div style={{ position: 'fixed', top: 24, left: '50%', transform: 'translateX(-50%)', background: '#10b981', color: '#fff', padding: '14px 28px', borderRadius: 12, fontFamily: "'Manrope', sans-serif", fontSize: 16, fontWeight: 600, boxShadow: '0 4px 24px rgba(0,0,0,0.4)', zIndex: 9999, whiteSpace: 'nowrap' }}>
           {toast}
         </div>
       )}
-      <header
-        className="flex items-center justify-between px-6 py-4"
-        style={{ borderBottom: '1px solid #1e293b' }}
-      >
-        <span className="text-xl font-bold" style={{ fontFamily: 'Sora, sans-serif', color: '#10b981' }}>
-          voclaire
-        </span>
 
-        <div className="flex items-center gap-4">
-          <div className="text-right">
-            <p className="text-sm text-white" style={{ fontFamily: 'Manrope, sans-serif' }}>{user?.email}</p>
-            <p className="text-xs text-gray-500 capitalize" style={{ fontFamily: 'Manrope, sans-serif' }}>
-              Plan {user?.plan}
-              {user?.plan === 'free' && (
-                <span className="ml-2 text-emerald-400 cursor-pointer hover:underline">→ Passer Pro</span>
-              )}
-            </p>
+      <header style={{ position: 'sticky', top: 0, zIndex: 50, backdropFilter: 'blur(12px)', background: 'rgba(3,7,18,0.72)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <div style={{ maxWidth: '1140px', margin: '0 auto', padding: '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{ width: '30px', height: '30px', borderRadius: '9px', background: 'linear-gradient(140deg,#10b981,#34d399)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px rgba(16,185,129,0.4)' }}>
+              <div style={{ width: '8px', height: '14px', background: '#fff', borderRadius: '4px' }} />
+            </div>
+            <span style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: '19px', letterSpacing: '-0.02em', color: '#fff' }}>voclaire</span>
           </div>
-          <button
-            onClick={handleLogout}
-            className="text-sm text-gray-400 hover:text-white transition-colors px-3 py-1.5 rounded-lg"
-            style={{ border: '1px solid #334155', fontFamily: 'Manrope, sans-serif' }}
-          >
-            Déconnexion
-          </button>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+            <div style={{ textAlign: 'right' }}>
+              <p style={{ fontSize: '14px', color: '#fff', fontWeight: 500, margin: 0 }}>{user?.email}</p>
+              <p style={{ fontSize: '12px', color: '#6b7280', fontWeight: 600, margin: 0, textTransform: 'capitalize' }}>
+                Plan {user?.plan}
+                {user?.plan === 'free' && (
+                  <span style={{ marginLeft: '8px', color: '#34d399', cursor: 'pointer' }}>→ Passer Pro</span>
+                )}
+              </p>
+            </div>
+            <button
+              onClick={handleLogout}
+              style={{ fontSize: '14px', color: '#9ca3af', background: 'transparent', border: '1px solid rgba(255,255,255,0.12)', padding: '8px 14px', borderRadius: '10px', cursor: 'pointer', fontFamily: "'Manrope', sans-serif", fontWeight: 500 }}
+            >
+              Déconnexion
+            </button>
+          </div>
         </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-6 py-12">
-        <h1
-          className="text-2xl font-bold text-white mb-8"
-          style={{ fontFamily: 'Sora, sans-serif' }}
-        >
-          Nouvelle transcription
-        </h1>
-        <SttForm />
+      <main style={{ maxWidth: '760px', margin: '0 auto', padding: '56px 24px' }}>
+        <div style={{ marginBottom: '32px' }}>
+          <div style={{ fontSize: '13px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#34d399', marginBottom: '10px' }}>Espace de travail</div>
+          <h1 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: '32px', letterSpacing: '-0.02em', color: '#fff', margin: 0 }}>
+            Nouvelle transcription
+          </h1>
+        </div>
+        <div style={{ background: 'linear-gradient(180deg,#0b1020,#080b16)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '28px', boxShadow: '0 24px 60px rgba(0,0,0,0.5)' }}>
+          <SttForm />
+        </div>
       </main>
     </div>
   )
