@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { transcribeAudio } from '../api/stt'
 
 const steps = [
@@ -90,9 +91,10 @@ export default function LandingPage() {
             </div>
             <span style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: '19px', letterSpacing: '-0.02em', color: '#fff' }}>voclaire</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '28px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
             <a href="#pricing" style={{ color: '#9ca3af', textDecoration: 'none', fontSize: '14.5px', fontWeight: 500 }}>Tarifs</a>
-            <a href="#demo" onClick={scrollToDemo} style={{ background: '#10b981', color: '#fff', textDecoration: 'none', padding: '9px 18px', borderRadius: '10px', fontSize: '14.5px', fontWeight: 600, boxShadow: '0 4px 14px rgba(16,185,129,0.35)' }}>Essayer gratuitement</a>
+            <Link to="/login" style={{ color: '#9ca3af', textDecoration: 'none', fontSize: '14.5px', fontWeight: 500 }}>Se connecter</Link>
+            <Link to="/register" style={{ background: '#10b981', color: '#fff', textDecoration: 'none', padding: '9px 18px', borderRadius: '10px', fontSize: '14.5px', fontWeight: 600, boxShadow: '0 4px 14px rgba(16,185,129,0.35)' }}>S'inscrire</Link>
           </div>
         </div>
       </nav>
