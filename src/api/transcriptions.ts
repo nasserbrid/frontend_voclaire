@@ -30,6 +30,22 @@ export async function getTranscriptions(): Promise<TranscriptionOut[]> {
   return res.json()
 }
 
+export async function improveTranscription(id: string, mode: string): Promise<TranscriptionOut> {
+  const res = await fetch(`${BASE}/transcriptions/${id}/improve`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ mode }),
+    credentials: 'include',
+  })
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}))
+    throw new Error(data.detail ?? `Erreur ${res.status}`)
+  }
+
+  return res.json()
+}
+
 export async function deleteTranscription(id: string): Promise<void> {
   const res = await fetch(`${BASE}/transcriptions/${id}`, {
     method: 'DELETE',
