@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { transcribeAudio } from '../api/stt'
+import ReviewsSection from './ReviewsSection'
 
 const steps = [
   { num: '01', title: 'Déposez votre audio', body: 'Glissez un fichier MP3, WAV ou M4A. Aucun compte, aucune installation.' },
@@ -289,6 +290,9 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* REVIEWS */}
+      <ReviewsSection />
 
       {/* FINAL CTA */}
       <section id="cta" style={{ position: 'relative', zIndex: 1, maxWidth: '1040px', margin: '60px auto 0', padding: '0 24px 90px' }}>

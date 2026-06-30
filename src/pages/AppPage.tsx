@@ -5,6 +5,7 @@ import SttForm from '../components/SttForm'
 import TermsModal from '../components/TermsModal'
 import { getTranscriptions, deleteTranscription, improveTranscription, exportTranscription, downloadBlob } from '../api/transcriptions'
 import { createPortalSession } from '../api/payments'
+import { submitReview } from '../api/reviews'
 import type { TranscriptionOut } from '../types/transcription'
 
 export default function AppPage() {
@@ -23,6 +24,11 @@ export default function AppPage() {
   const [termsAccepted, setTermsAccepted] = useState(
     user?.terms_accepted ?? true
   )
+  const [reviewRating, setReviewRating] = useState(5)
+  const [reviewContent, setReviewContent] = useState('')
+  const [reviewSubmitting, setReviewSubmitting] = useState(false)
+  const [reviewDone, setReviewDone] = useState(false)
+  const [reviewError, setReviewError] = useState('')
 
   useEffect(() => {
     if (!toast) return
@@ -82,6 +88,21 @@ export default function AppPage() {
       setErrorMap((prev) => ({ ...prev, [id]: msg }))
     } finally {
       setImprovingId(null)
+    }
+  }
+
+  async function handleReviewSubmit() {
+    if (reviewSubmitting || reviewContent.trim().length < 10) return
+    setReviewSubmitting(true)
+    setReviewError('')
+    try {
+      await submitReview(reviewContent.trim(), reviewRating)
+      setReviewDone(true)
+      setReviewContent('')
+    } catch (err) {
+      setReviewError(err instanceof Error ? err.message : 'Erreur lors de la soumission')
+    } finally {
+      setReviewSubmitting(false)
     }
   }
 
@@ -303,6 +324,52 @@ export default function AppPage() {
             </div>
           </div>
         )}
+
+        <div style={{ marginTop: '56px' }}>
+          <div style={{ fontSize: '13px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#34d399', marginBottom: '10px' }}>Votre avis</div>
+          <h2 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: '22px', letterSpacing: '-0.02em', color: '#fff', margin: '0 0 20px' }}>
+            Laisser un avis
+          </h2>
+          {reviewDone ? (
+            <div style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.25)', borderRadius: '14px', padding: '20px 24px', color: '#34d399', fontWeight: 600, fontSize: '15px' }}>
+              Merci pour votre avis ! Il est maintenant visible sur la page d'accueil.
+            </div>
+          ) : (
+            <div style={{ background: 'linear-gradient(180deg,#0b1020,#080b16)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '22px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '16px' }}>
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    onClick={() => setReviewRating(star)}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '24px', color: star <= reviewRating ? '#fbbf24' : 'rgba(255,255,255,0.15)', padding: '0 2px', lineHeight: 1 }}
+                  >★</button>
+                ))}
+                <span style={{ fontSize: '13px', color: '#6b7280', fontWeight: 500, marginLeft: '6px' }}>{reviewRating}/5</span>
+              </div>
+              <textarea
+                value={reviewContent}
+                onChange={(e) => setReviewContent(e.target.value)}
+                placeholder="Décrivez votre expérience avec voclaire… (10 à 500 caractères)"
+                maxLength={500}
+                rows={4}
+                style={{ width: '100%', background: '#05070f', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', color: '#e5e7eb', fontFamily: "'Manrope', sans-serif", fontSize: '14px', lineHeight: 1.6, padding: '12px 14px', resize: 'vertical', outline: 'none', boxSizing: 'border-box' }}
+              />
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '10px' }}>
+                <span style={{ fontSize: '12px', color: '#6b7280', fontWeight: 500 }}>{reviewContent.length}/500</span>
+                <button
+                  onClick={handleReviewSubmit}
+                  disabled={reviewSubmitting || reviewContent.trim().length < 10}
+                  style={{ background: reviewContent.trim().length < 10 ? 'rgba(16,185,129,0.4)' : '#10b981', color: '#fff', border: 'none', borderRadius: '10px', padding: '10px 22px', fontSize: '14px', fontFamily: "'Manrope', sans-serif", fontWeight: 700, cursor: reviewContent.trim().length < 10 || reviewSubmitting ? 'not-allowed' : 'pointer' }}
+                >
+                  {reviewSubmitting ? 'Envoi…' : "Publier l'avis"}
+                </button>
+              </div>
+              {reviewError && (
+                <p style={{ fontSize: '13px', color: '#f87171', margin: '8px 0 0' }}>{reviewError}</p>
+              )}
+            </div>
+          )}
+        </div>
       </main>
 
       <footer style={{ borderTop: '1px solid rgba(255,255,255,0.06)', padding: '20px 24px', marginTop: '16px' }}>
