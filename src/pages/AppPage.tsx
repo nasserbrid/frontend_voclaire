@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import SttForm from '../components/SttForm'
+import TermsModal from '../components/TermsModal'
 import { getTranscriptions, deleteTranscription, improveTranscription, exportTranscription, downloadBlob } from '../api/transcriptions'
 import { createPortalSession } from '../api/payments'
-import { getMe } from '../api/auth'
 import type { TranscriptionOut } from '../types/transcription'
 
 export default function AppPage() {
   'use no memo'
-  const { user, logout, setUser } = useAuth()
+  const { user, logout, setUser, refreshUser } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const [toast, setToast] = useState<string | null>(
@@ -20,6 +20,9 @@ export default function AppPage() {
   const [modeMap, setModeMap] = useState<Record<string, string>>({})
   const [errorMap, setErrorMap] = useState<Record<string, string>>({})
   const [downloadingFormat, setDownloadingFormat] = useState<Record<string, string>>({})
+  const [termsAccepted, setTermsAccepted] = useState(
+    user?.terms_accepted ?? true
+  )
 
   useEffect(() => {
     if (!toast) return
@@ -33,13 +36,14 @@ export default function AppPage() {
     if (params.get('payment') === 'success') {
       setToast('Bienvenue en Pro ! Votre abonnement est actif.')
       window.history.replaceState({}, '', '/app')
-      getMe().then((updatedUser) => setUser(updatedUser)).catch(() => {})
+      refreshUser().catch(() => {})
     }
   }, [])
 
   useEffect(() => {
+    if (!user) return
     getTranscriptions().then(setHistory).catch(() => setHistory([]))
-  }, [])
+  }, [user])
 
   async function handleLogout() {
     await logout()
@@ -97,6 +101,9 @@ export default function AppPage() {
 
   return (
     <div style={{ background: '#030712', color: '#e5e7eb', fontFamily: "'Manrope', sans-serif", minHeight: '100vh' }}>
+      {!termsAccepted && (
+        <TermsModal onAccepted={() => setTermsAccepted(true)} />
+      )}
       {toast && (
         <div style={{ position: 'fixed', top: 24, left: '50%', transform: 'translateX(-50%)', background: '#10b981', color: '#fff', padding: '14px 28px', borderRadius: 12, fontFamily: "'Manrope', sans-serif", fontSize: 16, fontWeight: 600, boxShadow: '0 4px 24px rgba(0,0,0,0.4)', zIndex: 9999, whiteSpace: 'nowrap' }}>
           {toast}
@@ -297,6 +304,18 @@ export default function AppPage() {
           </div>
         )}
       </main>
+
+      <footer style={{ borderTop: '1px solid rgba(255,255,255,0.06)', padding: '20px 24px', marginTop: '16px' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: '4px 12px', fontSize: '12px', color: '#6b7280' }}>
+          <Link to="/mentions-legales" style={{ color: '#6b7280', textDecoration: 'none' }}>Mentions légales</Link>
+          <span>·</span>
+          <Link to="/politique-de-confidentialite" style={{ color: '#6b7280', textDecoration: 'none' }}>Politique de confidentialité</Link>
+          <span>·</span>
+          <Link to="/cgu" style={{ color: '#6b7280', textDecoration: 'none' }}>CGU</Link>
+          <span>·</span>
+          <Link to="/cgv" style={{ color: '#6b7280', textDecoration: 'none' }}>CGV</Link>
+        </div>
+      </footer>
     </div>
   )
 }

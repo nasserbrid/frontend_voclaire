@@ -7,6 +7,10 @@ import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import AppPage from './pages/AppPage'
 import PricingPage from './pages/PricingPage'
+import MentionsLegalesPage from './pages/MentionsLegalesPage'
+import PolitiqueConfidentialitePage from './pages/PolitiqueConfidentialitePage'
+import CguPage from './pages/CguPage'
+import CgvPage from './pages/CgvPage'
 
 // Lu une seule fois au chargement du module (avant tout montage React/StrictMode)
 const _googleAuthJustCompleted = sessionStorage.getItem('vc:oauth_pending') === '1'
@@ -36,6 +40,10 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/pricing" element={<PricingPage />} />
+          <Route path="/mentions-legales" element={<MentionsLegalesPage />} />
+          <Route path="/politique-de-confidentialite" element={<PolitiqueConfidentialitePage />} />
+          <Route path="/cgu" element={<CguPage />} />
+          <Route path="/cgv" element={<CgvPage />} />
           <Route
             path="/app"
             element={

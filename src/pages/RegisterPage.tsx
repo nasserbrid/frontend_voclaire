@@ -10,6 +10,7 @@ export default function RegisterPage() {
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [acceptedTerms, setAcceptedTerms] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -18,7 +19,7 @@ export default function RegisterPage() {
     setLoading(true)
     setError('')
     try {
-      const user = await register({ email, password })
+      const user = await register({ email, password }, acceptedTerms)
       setUser(user)
       navigate('/app', { state: { toast: 'Bienvenue dans voclaire !' } })
     } catch (err) {
@@ -72,11 +73,30 @@ export default function RegisterPage() {
               <p className="text-sm text-red-400" style={{ fontFamily: 'Manrope, sans-serif' }}>{error}</p>
             )}
 
+            <label className="flex items-start gap-2 text-sm text-zinc-300 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={acceptedTerms}
+                onChange={(e) => setAcceptedTerms(e.target.checked)}
+                className="mt-0.5 accent-emerald-500"
+              />
+              <span style={{ fontFamily: 'Manrope, sans-serif' }}>
+                J'ai lu et j'accepte les{' '}
+                <a href="/cgu" target="_blank" rel="noopener noreferrer" style={{ color: '#34d399', textDecoration: 'underline' }}>
+                  CGU
+                </a>{' '}
+                et la{' '}
+                <a href="/politique-de-confidentialite" target="_blank" rel="noopener noreferrer" style={{ color: '#34d399', textDecoration: 'underline' }}>
+                  Politique de confidentialité
+                </a>
+              </span>
+            </label>
+
             <button
               type="submit"
-              disabled={loading}
-              className="rounded-xl py-3 font-semibold text-white transition-opacity disabled:opacity-50"
-              style={{ background: '#10b981', fontFamily: 'Manrope, sans-serif' }}
+              disabled={!acceptedTerms || loading}
+              className="rounded-xl py-3 font-semibold text-white transition-opacity"
+              style={{ background: '#10b981', fontFamily: 'Manrope, sans-serif', opacity: (!acceptedTerms || loading) ? 0.5 : 1, cursor: (!acceptedTerms || loading) ? 'not-allowed' : 'pointer' }}
             >
               {loading ? 'Création...' : 'Créer mon compte'}
             </button>

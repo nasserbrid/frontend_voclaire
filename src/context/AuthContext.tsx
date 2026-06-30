@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react'
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react'
 import { getMe, logout as apiLogout } from '../api/auth'
 import type { UserOut } from '../types'
 
@@ -7,6 +7,7 @@ interface AuthContextValue {
   loading: boolean
   setUser: (user: UserOut | null) => void
   logout: () => Promise<void>
+  refreshUser: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
@@ -14,8 +15,11 @@ const AuthContext = createContext<AuthContextValue | null>(null)
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<UserOut | null>(null)
   const [loading, setLoading] = useState(true)
+  const hasFetched = useRef(false)
 
   useEffect(() => {
+    if (hasFetched.current) return
+    hasFetched.current = true
     getMe()
       .then(setUser)
       .catch(() => setUser(null))
@@ -27,8 +31,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null)
   }
 
+  async function refreshUser() {
+    const updated = await getMe()
+    setUser(updated)
+  }
+
   return (
-    <AuthContext.Provider value={{ user, loading, setUser, logout }}>
+    <AuthContext.Provider value={{ user, loading, setUser, logout, refreshUser }}>
       {children}
     </AuthContext.Provider>
   )

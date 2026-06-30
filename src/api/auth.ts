@@ -15,10 +15,10 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   return response.json() as Promise<T>
 }
 
-export async function register(data: RegisterRequest): Promise<UserOut> {
+export async function register(data: RegisterRequest, acceptedTerms: boolean): Promise<UserOut> {
   return request<UserOut>('/auth/register', {
     method: 'POST',
-    body: JSON.stringify(data),
+    body: JSON.stringify({ ...data, accepted_terms: acceptedTerms }),
   })
 }
 
@@ -35,4 +35,12 @@ export async function logout(): Promise<void> {
 
 export async function getMe(): Promise<UserOut> {
   return request<UserOut>('/users/me')
+}
+
+export async function acceptTerms(): Promise<void> {
+  const res = await fetch(
+    `${import.meta.env.VITE_BACKEND_VOCLAIRE_URL}/users/me/accept-terms`,
+    { method: 'POST', credentials: 'include' }
+  )
+  if (!res.ok) throw new Error('Erreur acceptation CGU')
 }

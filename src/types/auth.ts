@@ -13,4 +13,5 @@ export interface UserOut {
   email: string
   plan: 'free' | 'pro'
   created_at: string
+  terms_accepted: boolean
 }

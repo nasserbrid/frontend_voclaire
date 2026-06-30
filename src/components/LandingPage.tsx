@@ -305,12 +305,23 @@ export default function LandingPage() {
 
       {/* FOOTER */}
       <footer style={{ position: 'relative', zIndex: 1, borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-        <div style={{ maxWidth: '1040px', margin: '0 auto', padding: '28px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '9px' }}>
-            <div style={{ width: '22px', height: '22px', borderRadius: '7px', background: 'linear-gradient(140deg,#10b981,#34d399)' }} />
-            <span style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, color: '#fff', fontSize: '15px' }}>voclaire</span>
+        <div style={{ maxWidth: '1040px', margin: '0 auto', padding: '28px 24px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '9px' }}>
+              <div style={{ width: '22px', height: '22px', borderRadius: '7px', background: 'linear-gradient(140deg,#10b981,#34d399)' }} />
+              <span style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, color: '#fff', fontSize: '15px' }}>voclaire</span>
+            </div>
+            <div style={{ fontSize: '13.5px', color: '#6b7280', fontWeight: 500 }}>© 2026 voclaire — Transcription audio par IA</div>
           </div>
-          <div style={{ fontSize: '13.5px', color: '#6b7280', fontWeight: 500 }}>© 2026 voclaire — Transcription audio par IA</div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: '4px 12px', marginTop: '16px', fontSize: '12px', color: '#6b7280' }}>
+            <Link to="/mentions-legales" style={{ color: '#6b7280', textDecoration: 'none' }}>Mentions légales</Link>
+            <span>·</span>
+            <Link to="/politique-de-confidentialite" style={{ color: '#6b7280', textDecoration: 'none' }}>Politique de confidentialité</Link>
+            <span>·</span>
+            <Link to="/cgu" style={{ color: '#6b7280', textDecoration: 'none' }}>CGU</Link>
+            <span>·</span>
+            <Link to="/cgv" style={{ color: '#6b7280', textDecoration: 'none' }}>CGV</Link>
+          </div>
         </div>
       </footer>
     </div>
