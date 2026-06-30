@@ -3,11 +3,13 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import SttForm from '../components/SttForm'
 import { getTranscriptions, deleteTranscription, improveTranscription, exportTranscription, downloadBlob } from '../api/transcriptions'
+import { createPortalSession } from '../api/payments'
+import { getMe } from '../api/auth'
 import type { TranscriptionOut } from '../types/transcription'
 
 export default function AppPage() {
   'use no memo'
-  const { user, logout } = useAuth()
+  const { user, logout, setUser } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const [toast, setToast] = useState<string | null>(
@@ -27,12 +29,30 @@ export default function AppPage() {
   }, [toast])
 
   useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    if (params.get('payment') === 'success') {
+      setToast('Bienvenue en Pro ! Votre abonnement est actif.')
+      window.history.replaceState({}, '', '/app')
+      getMe().then((updatedUser) => setUser(updatedUser)).catch(() => {})
+    }
+  }, [])
+
+  useEffect(() => {
     getTranscriptions().then(setHistory).catch(() => setHistory([]))
   }, [])
 
   async function handleLogout() {
     await logout()
     navigate('/')
+  }
+
+  async function handleManageSubscription() {
+    try {
+      const url = await createPortalSession()
+      window.open(url, '_blank')
+    } catch {
+      setToast('Erreur lors de la redirection vers le portail')
+    }
   }
 
   async function handleDelete(id: string) {
@@ -92,7 +112,7 @@ export default function AppPage() {
             <span style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: '19px', letterSpacing: '-0.02em', color: '#fff' }}>voclaire</span>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{ textAlign: 'right' }}>
               <p style={{ fontSize: '14px', color: '#fff', fontWeight: 500, margin: 0 }}>{user?.email}</p>
               <p style={{ fontSize: '12px', color: '#6b7280', fontWeight: 600, margin: 0, textTransform: 'capitalize' }}>
@@ -105,6 +125,14 @@ export default function AppPage() {
                 )}
               </p>
             </div>
+            {user?.plan === 'pro' && (
+              <button
+                onClick={handleManageSubscription}
+                style={{ fontSize: '14px', color: '#9ca3af', background: 'transparent', border: '1px solid rgba(255,255,255,0.12)', padding: '8px 14px', borderRadius: '10px', cursor: 'pointer', fontFamily: "'Manrope', sans-serif", fontWeight: 500 }}
+              >
+                Gérer l'abonnement
+              </button>
+            )}
             <button
               onClick={handleLogout}
               style={{ fontSize: '14px', color: '#9ca3af', background: 'transparent', border: '1px solid rgba(255,255,255,0.12)', padding: '8px 14px', borderRadius: '10px', cursor: 'pointer', fontFamily: "'Manrope', sans-serif", fontWeight: 500 }}
@@ -129,7 +157,7 @@ export default function AppPage() {
           )}
         </div>
         <div style={{ background: 'linear-gradient(180deg,#0b1020,#080b16)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '28px', boxShadow: '0 24px 60px rgba(0,0,0,0.5)' }}>
-          <SttForm />
+          <SttForm onTranscribed={(t) => setHistory((prev) => [t, ...prev])} />
         </div>
 
         {history.length > 0 && (

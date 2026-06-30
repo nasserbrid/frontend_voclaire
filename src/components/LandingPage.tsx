@@ -9,22 +9,33 @@ const steps = [
 ]
 
 const freeFeatures = [
-  'Transcription audio illimitée en test',
+  '60 min de transcription / mois',
   'Modèle Whisper haute précision',
-  'Détection automatique de la langue',
+  '10 améliorations LLM / mois',
+  'Export DOCX (texte brut)',
   'Copier / coller instantané',
 ]
 
 const proFeatures = [
-  'Correction de la ponctuation et des fautes',
-  'Reformulation et structuration du texte',
-  "Résumé automatique de l'enregistrement",
-  'Export en plusieurs formats : Word, PowerPoint, PDF',
-  'Historique et sauvegarde des transcriptions',
+  'Transcription illimitée',
+  'LLM illimité (correction, reformulation, résumé)',
+  'Modèle Whisper fine-tuné français',
+  'Export Word, PDF et PowerPoint structurés',
+  'Historique et sauvegarde illimités',
 ]
 
-const freePlan = ["Transcription IA", "Fichiers jusqu'à 25 Mo", 'Export texte brut']
-const proPlan = ['Tout du plan Free', 'Post-traitement IA (correction, reformulation)', 'Fichiers longue durée', 'Historique illimité & sauvegarde']
+const freePlan = [
+  '60 min de transcription / mois',
+  '10 améliorations LLM / mois',
+  'Export DOCX (texte brut)',
+]
+const proPlan = [
+  'Transcription illimitée',
+  'LLM illimité (correction, reformulation, résumé)',
+  'Modèle Whisper fine-tuné français',
+  'Export Word, PDF et PowerPoint structurés',
+  'Résiliation en 1 clic',
+]
 
 export default function LandingPage() {
   const [file, setFile] = useState<File | null>(null)
@@ -211,7 +222,7 @@ export default function LandingPage() {
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
           <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '30px' }}>
-            <div style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: '20px', color: '#fff', marginBottom: '6px' }}>Transcription</div>
+            <div style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: '20px', color: '#fff', marginBottom: '6px' }}>Free</div>
             <div style={{ fontSize: '13.5px', color: '#9ca3af', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '22px' }}>Gratuit</div>
             {freeFeatures.map(f => (
               <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: '11px', padding: '9px 0', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
@@ -221,8 +232,8 @@ export default function LandingPage() {
             ))}
           </div>
           <div style={{ background: 'linear-gradient(180deg,rgba(16,185,129,0.14),rgba(16,185,129,0.04))', border: '1px solid rgba(16,185,129,0.4)', borderRadius: '20px', padding: '30px' }}>
-            <div style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: '20px', color: '#fff', marginBottom: '6px' }}>Post-traitement IA</div>
-            <div style={{ fontSize: '13.5px', color: '#6ee7b7', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '22px' }}>Pro</div>
+            <div style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: '20px', color: '#fff', marginBottom: '6px' }}>Pro</div>
+            <div style={{ fontSize: '13.5px', color: '#6ee7b7', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '22px' }}>9,99 € / mois</div>
             {proFeatures.map(f => (
               <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: '11px', padding: '9px 0', borderTop: '1px solid rgba(16,185,129,0.18)' }}>
                 <span style={{ color: '#34d399', fontSize: '15px', marginTop: '1px' }}>✦</span>
@@ -260,10 +271,11 @@ export default function LandingPage() {
           <div style={{ background: 'linear-gradient(180deg,rgba(16,185,129,0.16),rgba(16,185,129,0.04))', border: '1px solid rgba(16,185,129,0.45)', borderRadius: '22px', padding: '34px', display: 'flex', flexDirection: 'column', position: 'relative', boxShadow: '0 20px 50px rgba(16,185,129,0.18)' }}>
             <div style={{ position: 'absolute', top: '-12px', left: '34px', background: '#10b981', color: '#fff', fontSize: '12px', fontWeight: 700, padding: '5px 12px', borderRadius: '999px', letterSpacing: '0.03em' }}>Populaire</div>
             <div style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: '21px', color: '#fff' }}>Pro</div>
-            <div style={{ margin: '18px 0 6px', display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-              <span style={{ fontFamily: "'Sora', sans-serif", fontSize: '46px', fontWeight: 800, color: '#fff', letterSpacing: '-0.03em' }}>12€</span>
+            <div style={{ margin: '18px 0 4px', display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+              <span style={{ fontFamily: "'Sora', sans-serif", fontSize: '46px', fontWeight: 800, color: '#fff', letterSpacing: '-0.03em' }}>9,99€</span>
               <span style={{ color: '#6ee7b7', fontSize: '15px', fontWeight: 600 }}>/ mois</span>
             </div>
+            <div style={{ fontSize: '13px', color: '#34d399', fontWeight: 600, marginBottom: '6px' }}>ou 7,99 € / mois en annuel <span style={{ background: 'rgba(16,185,129,0.2)', padding: '2px 7px', borderRadius: '6px' }}>-20%</span></div>
             <div style={{ fontSize: '14.5px', color: '#6ee7b7', marginBottom: '24px', fontWeight: 500 }}>Pour transcrire et affiner au quotidien.</div>
             <div style={{ flex: 1 }}>
               {proPlan.map(f => (
