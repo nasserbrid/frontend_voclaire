@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { getReviews } from '../api/reviews'
 import type { ReviewOut } from '../types/review'
 

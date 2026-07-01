@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import SttForm from '../components/SttForm'
@@ -10,7 +10,7 @@ import type { TranscriptionOut } from '../types/transcription'
 
 export default function AppPage() {
   'use no memo'
-  const { user, logout, setUser, refreshUser } = useAuth()
+  const { user, logout, refreshUser } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const [toast, setToast] = useState<string | null>(

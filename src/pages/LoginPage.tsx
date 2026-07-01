@@ -50,7 +50,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 className="rounded-xl px-4 py-3 text-white outline-none focus:ring-2"
-                style={{ background: '#1e293b', border: '1px solid #334155', fontFamily: 'Manrope, sans-serif', focusRingColor: '#10b981' }}
+                style={{ background: '#1e293b', border: '1px solid #334155', fontFamily: 'Manrope, sans-serif' }}
               />
             </label>
 
