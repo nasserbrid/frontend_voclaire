@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { transcribeAudio } from '../api/transcriptions'
+import React, { useEffect, useRef, useState } from 'react'
+import { transcribeAudio, pollTranscription } from '../api/transcriptions'
 import type { TranscriptionOut } from '../types/transcription'
 
 interface SttFormProps {
@@ -14,6 +14,12 @@ export default function SttForm({ onTranscribed }: SttFormProps) {
   const [dragging, setDragging] = useState(false)
   const [copied, setCopied] = useState(false)
   const [meta, setMeta] = useState('')
+
+  const stopPollRef = useRef<(() => void) | null>(null)
+
+  useEffect(() => {
+    return () => stopPollRef.current?.()
+  }, [])
 
   function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0]
@@ -35,12 +41,28 @@ export default function SttForm({ onTranscribed }: SttFormProps) {
     const t0 = Date.now()
     try {
       const result = await transcribeAudio(file)
+
+      if (result.status === 'processing') {
+        stopPollRef.current = pollTranscription(result.id, (t) => {
+          if (t.status === 'done') {
+            setTranscript(t.text)
+            setMeta(((Date.now() - t0) / 1000).toFixed(1) + 's')
+            setLoading(false)
+            onTranscribed?.(t)
+          } else if (t.status === 'error') {
+            setError('Erreur lors de la transcription')
+            setLoading(false)
+          }
+        })
+        return
+      }
+
       setTranscript(result.text)
       setMeta(((Date.now() - t0) / 1000).toFixed(1) + 's')
+      setLoading(false)
       onTranscribed?.(result)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur lors de la transcription')
-    } finally {
       setLoading(false)
     }
   }

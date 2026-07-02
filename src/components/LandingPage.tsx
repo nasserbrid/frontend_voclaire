@@ -1,40 +1,50 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { transcribeAudio } from '../api/stt'
+import { getDictaphoneUnsupportedReason } from '../utils/mediaSupport'
 import ReviewsSection from './ReviewsSection'
 
+const DEMO_MAX_MINUTES = 10
+
 const steps = [
-  { num: '01', title: 'Déposez votre audio', body: 'Glissez un fichier MP3, WAV ou M4A. Aucun compte, aucune installation.' },
+  { num: '01', title: 'Enregistrez ou déposez', body: 'Enregistrez une réunion directement depuis Google Meet, Teams ou Zoom, ou déposez un fichier MP3, WAV, M4A.' },
   { num: '02', title: "L'IA transcrit", body: 'Le modèle Whisper convertit la parole en texte avec une grande précision, en français.' },
-  { num: '03', title: 'Récupérez le texte', body: "Copiez, exportez, ou affinez le résultat avec le post-traitement IA." },
+  { num: '03', title: 'Récupérez le texte', body: "Copiez, exportez en DOCX/PDF/PPTX, ou affinez avec la correction et la reformulation IA." },
 ]
 
 const freeFeatures = [
   '60 min de transcription / mois',
+  'Fichier audio max 30 min',
+  'Enregistrement réunion max 10 min',
   'Modèle Whisper haute précision',
   '10 améliorations LLM / mois',
   'Export DOCX (texte brut)',
-  'Copier / coller instantané',
 ]
 
 const proFeatures = [
-  'Transcription illimitée',
+  "Transcription illimitée (fichiers jusqu'à 3h)",
+  "Enregistrement réunion jusqu'à 30 min",
   'LLM illimité (correction, reformulation, résumé)',
   'Modèle Whisper fine-tuné français',
   'Export Word, PDF et PowerPoint structurés',
+  'Transcription de réunion structurée',
   'Historique et sauvegarde illimités',
 ]
 
 const freePlan = [
   '60 min de transcription / mois',
+  'Fichier audio max 30 min',
+  'Enregistrement réunion max 10 min',
   '10 améliorations LLM / mois',
   'Export DOCX (texte brut)',
 ]
 const proPlan = [
-  'Transcription illimitée',
+  "Transcription illimitée (fichiers jusqu'à 3h)",
+  "Enregistrement réunion jusqu'à 30 min",
   'LLM illimité (correction, reformulation, résumé)',
   'Modèle Whisper fine-tuné français',
   'Export Word, PDF et PowerPoint structurés',
+  'Transcription de réunion structurée',
   'Résiliation en 1 clic',
 ]
 
@@ -46,6 +56,143 @@ export default function LandingPage() {
   const [dragging, setDragging] = useState(false)
   const [copied, setCopied] = useState(false)
   const [meta, setMeta] = useState('')
+
+  const [demoRecording, setDemoRecording] = useState(false)
+  const [demoElapsed, setDemoElapsed] = useState(0)
+  const [demoAudioFile, setDemoAudioFile] = useState<File | null>(null)
+  const [demoTranscript, setDemoTranscript] = useState<string | null>(null)
+  const [demoLoading, setDemoLoading] = useState(false)
+  const [demoError, setDemoError] = useState<string | null>(null)
+  const [demoMicWarning, setDemoMicWarning] = useState<string | null>(null)
+  const [demoUnsupportedReason] = useState(getDictaphoneUnsupportedReason)
+
+  const demoMediaRecorderRef = useRef<MediaRecorder | null>(null)
+  const demoChunksRef = useRef<Blob[]>([])
+  const demoTimerRef = useRef<number | null>(null)
+  const demoDisplayStreamRef = useRef<MediaStream | null>(null)
+  const demoMicStreamRef = useRef<MediaStream | null>(null)
+  const demoAudioContextRef = useRef<AudioContext | null>(null)
+
+  function cleanupDemoStreams() {
+    demoDisplayStreamRef.current?.getTracks().forEach((t) => t.stop())
+    demoMicStreamRef.current?.getTracks().forEach((t) => t.stop())
+    demoAudioContextRef.current?.close()
+    demoDisplayStreamRef.current = null
+    demoMicStreamRef.current = null
+    demoAudioContextRef.current = null
+  }
+
+  useEffect(() => {
+    return () => {
+      if (demoTimerRef.current !== null) clearInterval(demoTimerRef.current)
+      cleanupDemoStreams()
+    }
+  }, [])
+
+  function stopDemoRecording() {
+    if (demoMediaRecorderRef.current && demoMediaRecorderRef.current.state !== 'inactive') {
+      demoMediaRecorderRef.current.stop()
+    }
+    if (demoTimerRef.current !== null) {
+      clearInterval(demoTimerRef.current)
+      demoTimerRef.current = null
+    }
+    setDemoRecording(false)
+  }
+
+  async function startDemoRecording() {
+    setDemoError(null)
+    setDemoMicWarning(null)
+    try {
+      const displayStream = await navigator.mediaDevices.getDisplayMedia({ audio: true, video: true })
+      displayStream.getVideoTracks().forEach((track) => {
+        track.stop()
+        displayStream.removeTrack(track)
+      })
+
+      if (displayStream.getAudioTracks().length === 0) {
+        displayStream.getTracks().forEach((t) => t.stop())
+        setDemoError("Aucun audio détecté. Repartagez en sélectionnant un onglet et en cochant « Partager l'audio de l'onglet ».")
+        return
+      }
+
+      let micStream: MediaStream | null = null
+      try {
+        micStream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      } catch {
+        setDemoMicWarning("Micro non autorisé — seule la voix des autres participants sera enregistrée.")
+      }
+
+      const audioContext = new AudioContext()
+      const destination = audioContext.createMediaStreamDestination()
+      audioContext.createMediaStreamSource(displayStream).connect(destination)
+      if (micStream) audioContext.createMediaStreamSource(micStream).connect(destination)
+
+      demoDisplayStreamRef.current = displayStream
+      demoMicStreamRef.current = micStream
+      demoAudioContextRef.current = audioContext
+
+      demoChunksRef.current = []
+      const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/ogg'
+      const mediaRecorder = new MediaRecorder(destination.stream, { mimeType })
+      demoMediaRecorderRef.current = mediaRecorder
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) demoChunksRef.current.push(e.data)
+      }
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(demoChunksRef.current, { type: mimeType })
+        setDemoAudioFile(new File([blob], 'reunion.webm', { type: mimeType }))
+        cleanupDemoStreams()
+      }
+      displayStream.getAudioTracks()[0].onended = () => stopDemoRecording()
+
+      mediaRecorder.start(1000)
+      setDemoAudioFile(null)
+      setDemoTranscript(null)
+      setDemoElapsed(0)
+      setDemoRecording(true)
+
+      let localElapsed = 0
+      demoTimerRef.current = window.setInterval(() => {
+        localElapsed += 1
+        setDemoElapsed(localElapsed)
+        if (localElapsed >= DEMO_MAX_MINUTES * 60) stopDemoRecording()
+      }, 1000)
+    } catch (err) {
+      setDemoError(err instanceof Error ? err.message : "Impossible de démarrer l'enregistrement")
+    }
+  }
+
+  async function handleDemoTranscribe() {
+    if (!demoAudioFile || demoLoading) return
+    setDemoLoading(true)
+    setDemoError(null)
+    try {
+      const text = await transcribeAudio(demoAudioFile)
+      setDemoTranscript(text)
+    } catch (err) {
+      setDemoError(err instanceof Error ? err.message : 'Erreur lors de la transcription')
+    } finally {
+      setDemoLoading(false)
+    }
+  }
+
+  function handleDemoDownload() {
+    if (!demoAudioFile) return
+    const url = URL.createObjectURL(demoAudioFile)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `reunion-${new Date().toISOString().slice(0, 10)}.webm`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  function formatDemoTime(seconds: number): string {
+    const m = Math.floor(seconds / 60).toString().padStart(2, '0')
+    const s = (seconds % 60).toString().padStart(2, '0')
+    return `${m}:${s}`
+  }
 
   function scrollToDemo(e: React.MouseEvent) {
     e.preventDefault()
@@ -129,11 +276,133 @@ export default function LandingPage() {
         <p style={{ fontSize: '13.5px', color: '#6b7280', marginTop: '22px', fontWeight: 500 }}>Aucune carte bancaire requise · Premier essai gratuit en bas de page</p>
       </section>
 
-      {/* DEMO */}
-      <section id="demo" style={{ position: 'relative', zIndex: 1, maxWidth: '760px', margin: '0 auto', padding: '40px 24px 90px' }}>
+      {/* DEMO DICTAPHONE */}
+      <section id="demo" style={{ position: 'relative', zIndex: 1, maxWidth: '760px', margin: '0 auto', padding: '40px 24px 60px' }}>
         <div style={{ textAlign: 'center', marginBottom: '30px' }}>
           <div style={{ fontSize: '13px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#34d399', marginBottom: '12px' }}>Démo en direct</div>
-          <h2 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: '34px', letterSpacing: '-0.02em', color: '#fff', margin: '0 0 10px' }}>Testez-le tout de suite</h2>
+          <h2 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: '34px', letterSpacing: '-0.02em', color: '#fff', margin: '0 0 10px' }}>Enregistrez votre réunion</h2>
+          <p style={{ color: '#9ca3af', fontSize: '16px', margin: 0, fontWeight: 500 }}>Capturez l'audio de Google Meet, Teams ou Zoom directement depuis le navigateur.</p>
+        </div>
+
+        <div style={{ background: 'linear-gradient(180deg,#0b1020,#080b16)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '28px', boxShadow: '0 24px 60px rgba(0,0,0,0.5)' }}>
+          {demoUnsupportedReason ? (
+            <div style={{ textAlign: 'center', padding: '34px 24px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.03)' }}>
+              <div style={{ fontSize: '14px', color: '#9ca3af', fontWeight: 500 }}>{demoUnsupportedReason}</div>
+            </div>
+          ) : (
+          <>
+          {!demoRecording && !demoAudioFile && (
+            <div style={{ textAlign: 'center', padding: '34px 24px', borderRadius: '16px', border: '1.5px dashed rgba(16,185,129,0.4)', background: 'rgba(16,185,129,0.04)' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'rgba(16,185,129,0.16)', border: '1px solid rgba(16,185,129,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px' }}>
+                <span style={{ width: '18px', height: '18px', borderRadius: '999px', background: '#ef4444', display: 'block' }} />
+              </div>
+              <div style={{ fontWeight: 700, fontSize: '16px', color: '#fff', marginBottom: '6px' }}>
+                Démarrer l'enregistrement
+              </div>
+              <div style={{ fontSize: '14px', color: '#9ca3af', fontWeight: 500, marginBottom: '18px' }}>
+                Partagez l'onglet de votre réunion en cochant « Partager l'audio de l'onglet »
+              </div>
+              <button
+                onClick={startDemoRecording}
+                style={{ padding: '13px 26px', borderRadius: '12px', border: 'none', fontFamily: "'Manrope', sans-serif", fontSize: '15px', fontWeight: 700, cursor: 'pointer', background: '#10b981', color: '#fff', boxShadow: '0 8px 24px rgba(16,185,129,0.4)' }}
+              >
+                Démarrer l'enregistrement
+              </button>
+            </div>
+          )}
+
+          {demoRecording && (
+            <div style={{ textAlign: 'center', padding: '34px 24px', borderRadius: '16px', border: '1.5px solid rgba(239,68,68,0.4)', background: 'rgba(239,68,68,0.06)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginBottom: '14px' }}>
+                <span style={{ width: '10px', height: '10px', borderRadius: '999px', background: '#ef4444', display: 'inline-block', animation: 'vc-pulse 1.2s ease-in-out infinite' }} />
+                <span style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: '26px', color: '#fff', letterSpacing: '0.02em' }}>{formatDemoTime(demoElapsed)}</span>
+              </div>
+              {DEMO_MAX_MINUTES * 60 - demoElapsed <= 120 && DEMO_MAX_MINUTES * 60 - demoElapsed > 0 && (
+                <div style={{ fontSize: '13px', color: '#fca5a5', fontWeight: 600, marginBottom: '14px' }}>
+                  Limite atteinte dans {Math.ceil((DEMO_MAX_MINUTES * 60 - demoElapsed) / 60)} min
+                </div>
+              )}
+              <button
+                onClick={stopDemoRecording}
+                style={{ padding: '13px 26px', borderRadius: '12px', border: 'none', fontFamily: "'Manrope', sans-serif", fontSize: '15px', fontWeight: 700, cursor: 'pointer', background: '#ef4444', color: '#fff', boxShadow: '0 8px 24px rgba(239,68,68,0.35)' }}
+              >
+                Arrêter
+              </button>
+            </div>
+          )}
+
+          {!demoRecording && demoAudioFile && (
+            <div style={{ padding: '24px', borderRadius: '16px', border: '1px solid rgba(16,185,129,0.3)', background: 'rgba(16,185,129,0.04)' }}>
+              <div style={{ fontSize: '14px', color: '#e5e7eb', fontWeight: 600, marginBottom: '4px' }}>
+                Enregistrement prêt · {formatDemoTime(demoElapsed)}
+              </div>
+              <div style={{ fontSize: '13px', color: '#9ca3af', fontWeight: 500, marginBottom: '18px' }}>
+                {Math.round(demoAudioFile.size / 1024)} Ko
+              </div>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button
+                  onClick={handleDemoTranscribe}
+                  disabled={demoLoading}
+                  style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', padding: '13px', borderRadius: '12px', border: 'none', fontFamily: "'Manrope', sans-serif", fontSize: '15px', fontWeight: 700, cursor: demoLoading ? 'not-allowed' : 'pointer', background: demoLoading ? 'rgba(16,185,129,0.4)' : '#10b981', color: '#fff', boxShadow: demoLoading ? 'none' : '0 8px 24px rgba(16,185,129,0.4)' }}
+                >
+                  {demoLoading && (
+                    <span style={{ width: '16px', height: '16px', border: '2px solid rgba(255,255,255,0.4)', borderTopColor: '#fff', borderRadius: '999px', display: 'inline-block', animation: 'vc-spin 0.7s linear infinite' }} />
+                  )}
+                  {demoLoading ? 'Transcription en cours…' : 'Transcrire maintenant'}
+                </button>
+                <button
+                  onClick={handleDemoDownload}
+                  style={{ padding: '13px 20px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.12)', fontFamily: "'Manrope', sans-serif", fontSize: '15px', fontWeight: 600, cursor: 'pointer', background: 'transparent', color: '#e5e7eb' }}
+                >
+                  Télécharger l'audio
+                </button>
+              </div>
+            </div>
+          )}
+
+          {demoMicWarning && (
+            <div style={{ marginTop: '14px', background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)', color: '#fbbf24', padding: '12px 16px', borderRadius: '12px', fontSize: '14px', fontWeight: 500 }}>
+              {demoMicWarning}
+            </div>
+          )}
+
+          {demoError && (
+            <div style={{ marginTop: '14px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', color: '#fca5a5', padding: '12px 16px', borderRadius: '12px', fontSize: '14px', fontWeight: 500 }}>
+              {demoError}
+            </div>
+          )}
+
+          {demoTranscript && (
+            <div style={{ marginTop: '22px', animation: 'vc-fadeup 0.4s ease' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ width: '7px', height: '7px', borderRadius: '999px', background: '#22c55e', display: 'inline-block' }} />
+                  <span style={{ fontSize: '13px', fontWeight: 700, color: '#e5e7eb', letterSpacing: '0.02em' }}>Transcription</span>
+                </div>
+              </div>
+              <div style={{ background: '#05070f', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', padding: '18px 20px', fontSize: '15.5px', lineHeight: 1.7, color: '#d1d5db', fontWeight: 500, whiteSpace: 'pre-wrap' }}>{demoTranscript}</div>
+              <div style={{ marginTop: '16px', display: 'flex', alignItems: 'center', gap: '12px', background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.22)', borderRadius: '14px', padding: '14px 18px' }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 700, fontSize: '14.5px', color: '#fff', marginBottom: '2px' }}>
+                    Affiner avec l'IA{' '}
+                    <span style={{ fontSize: '11px', background: '#10b981', color: '#fff', padding: '2px 7px', borderRadius: '6px', verticalAlign: 'middle', marginLeft: '4px' }}>Pro</span>
+                  </div>
+                  <div style={{ fontSize: '13.5px', color: '#9ca3af', fontWeight: 500 }}>Corrigez la ponctuation, reformulez, structurez automatiquement.</div>
+                </div>
+                <a href="#cta" style={{ background: '#10b981', color: '#fff', textDecoration: 'none', padding: '9px 16px', borderRadius: '10px', fontSize: '13.5px', fontWeight: 700, whiteSpace: 'nowrap' }}>Débloquer</a>
+              </div>
+            </div>
+          )}
+          </>
+          )}
+        </div>
+      </section>
+
+      {/* DEMO FICHIER */}
+      <section style={{ position: 'relative', zIndex: 1, maxWidth: '760px', margin: '0 auto', padding: '0 24px 90px' }}>
+        <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+          <div style={{ fontSize: '13px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#34d399', marginBottom: '12px' }}>Déjà un enregistrement ?</div>
+          <h2 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: '34px', letterSpacing: '-0.02em', color: '#fff', margin: '0 0 10px' }}>Ou déposez un fichier audio</h2>
           <p style={{ color: '#9ca3af', fontSize: '16px', margin: 0, fontWeight: 500 }}>Déposez un fichier audio. La transcription s'affiche ici même.</p>
         </div>
 
@@ -267,7 +536,12 @@ export default function LandingPage() {
                 </div>
               ))}
             </div>
-            <a href="#cta" style={{ marginTop: '24px', textAlign: 'center', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', color: '#fff', textDecoration: 'none', padding: '13px', borderRadius: '12px', fontWeight: 700, fontSize: '15px', display: 'block' }}>Commencer gratuitement</a>
+            <Link
+              to="/register"
+              style={{ marginTop: '24px', textAlign: 'center', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', color: '#fff', textDecoration: 'none', padding: '13px', borderRadius: '12px', fontWeight: 700, fontSize: '15px', display: 'block' }}
+            >
+              Commencer gratuitement
+            </Link>
           </div>
           <div style={{ background: 'linear-gradient(180deg,rgba(16,185,129,0.16),rgba(16,185,129,0.04))', border: '1px solid rgba(16,185,129,0.45)', borderRadius: '22px', padding: '34px', display: 'flex', flexDirection: 'column', position: 'relative', boxShadow: '0 20px 50px rgba(16,185,129,0.18)' }}>
             <div style={{ position: 'absolute', top: '-12px', left: '34px', background: '#10b981', color: '#fff', fontSize: '12px', fontWeight: 700, padding: '5px 12px', borderRadius: '999px', letterSpacing: '0.03em' }}>Populaire</div>
@@ -286,7 +560,12 @@ export default function LandingPage() {
                 </div>
               ))}
             </div>
-            <a href="#cta" style={{ marginTop: '24px', textAlign: 'center', background: '#10b981', color: '#fff', textDecoration: 'none', padding: '13px', borderRadius: '12px', fontWeight: 700, fontSize: '15px', boxShadow: '0 8px 24px rgba(16,185,129,0.4)', display: 'block' }}>Passer au Pro</a>
+            <Link
+              to="/pricing"
+              style={{ marginTop: '24px', textAlign: 'center', background: '#10b981', color: '#fff', textDecoration: 'none', padding: '13px', borderRadius: '12px', fontWeight: 700, fontSize: '15px', boxShadow: '0 8px 24px rgba(16,185,129,0.4)', display: 'block' }}
+            >
+              Passer au Pro
+            </Link>
           </div>
         </div>
       </section>
@@ -301,7 +580,12 @@ export default function LandingPage() {
           <div style={{ position: 'relative' }}>
             <h2 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 800, fontSize: '42px', letterSpacing: '-0.03em', color: '#fff', margin: '0 0 16px' }}>Créez votre compte gratuit</h2>
             <p style={{ fontSize: '18px', color: '#6ee7b7', maxWidth: '520px', margin: '0 auto 34px', fontWeight: 500, lineHeight: 1.55 }}>Sauvegardez vos transcriptions, retrouvez votre historique et débloquez le post-traitement IA.</p>
-            <a href="#" style={{ background: '#10b981', color: '#fff', textDecoration: 'none', padding: '16px 36px', borderRadius: '13px', fontSize: '17px', fontWeight: 700, boxShadow: '0 10px 32px rgba(16,185,129,0.5)', display: 'inline-block' }}>Créer un compte gratuit</a>
+            <Link
+              to="/register"
+              style={{ background: '#10b981', color: '#fff', textDecoration: 'none', padding: '16px 36px', borderRadius: '13px', fontSize: '17px', fontWeight: 700, boxShadow: '0 10px 32px rgba(16,185,129,0.5)', display: 'inline-block' }}
+            >
+              Créer un compte gratuit
+            </Link>
             <p style={{ fontSize: '13.5px', color: '#8b8fa3', marginTop: '20px', fontWeight: 500 }}>Gratuit pour toujours · Sans carte bancaire</p>
           </div>
         </div>

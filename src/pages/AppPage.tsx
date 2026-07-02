@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import SttForm from '../components/SttForm'
+import Dictaphone from '../components/Dictaphone'
 import TermsModal from '../components/TermsModal'
-import { getTranscriptions, deleteTranscription, improveTranscription, exportTranscription, downloadBlob } from '../api/transcriptions'
+import { getTranscriptions, deleteTranscription, improveTranscription, exportTranscription, downloadBlob, pollTranscription } from '../api/transcriptions'
 import { createPortalSession } from '../api/payments'
 import { submitReview } from '../api/reviews'
 import type { TranscriptionOut } from '../types/transcription'
@@ -29,6 +30,7 @@ export default function AppPage() {
   const [reviewSubmitting, setReviewSubmitting] = useState(false)
   const [reviewDone, setReviewDone] = useState(false)
   const [reviewError, setReviewError] = useState('')
+  const maxMinutes = user?.plan === 'pro' ? 180 : 15
 
   useEffect(() => {
     if (!toast) return
@@ -48,7 +50,22 @@ export default function AppPage() {
 
   useEffect(() => {
     if (!user) return
-    getTranscriptions().then(setHistory).catch(() => setHistory([]))
+    const stopFns: Array<() => void> = []
+    getTranscriptions()
+      .then((items) => {
+        setHistory(items)
+        items
+          .filter((t) => t.status === 'processing')
+          .forEach((t) => {
+            stopFns.push(
+              pollTranscription(t.id, (updated) => {
+                setHistory((prev) => prev.map((item) => (item.id === updated.id ? updated : item)))
+              })
+            )
+          })
+      })
+      .catch(() => setHistory([]))
+    return () => stopFns.forEach((stop) => stop())
   }, [user])
 
   async function handleLogout() {
@@ -184,6 +201,24 @@ export default function AppPage() {
             </div>
           )}
         </div>
+
+        <div style={{ marginBottom: '10px' }}>
+          <h2 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: '20px', letterSpacing: '-0.02em', color: '#fff', margin: '0 0 4px' }}>
+            Enregistrer une réunion
+          </h2>
+          <p style={{ fontSize: '14px', color: '#9ca3af', margin: 0, fontWeight: 500 }}>
+            Capturez l'audio de Google Meet, Teams ou Zoom
+          </p>
+        </div>
+        <div style={{ background: 'linear-gradient(180deg,#0b1020,#080b16)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '28px', boxShadow: '0 24px 60px rgba(0,0,0,0.5)' }}>
+          <Dictaphone onTranscribed={(t) => setHistory((prev) => [t, ...prev])} maxMinutes={maxMinutes} />
+        </div>
+
+        <div style={{ marginTop: '40px', marginBottom: '10px' }}>
+          <h2 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: '20px', letterSpacing: '-0.02em', color: '#fff', margin: 0 }}>
+            Importer un fichier audio
+          </h2>
+        </div>
         <div style={{ background: 'linear-gradient(180deg,#0b1020,#080b16)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '28px', boxShadow: '0 24px 60px rgba(0,0,0,0.5)' }}>
           <SttForm onTranscribed={(t) => setHistory((prev) => [t, ...prev])} />
         </div>
@@ -225,9 +260,24 @@ export default function AppPage() {
                       </div>
                     </div>
 
-                    <p style={{ fontSize: '14px', color: '#9ca3af', margin: 0, lineHeight: 1.6, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
-                      {t.text}
-                    </p>
+                    {t.status === 'processing' && (
+                      <p style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: '#9ca3af', margin: 0, lineHeight: 1.6 }}>
+                        <span style={{ width: '14px', height: '14px', border: '2px solid rgba(255,255,255,0.2)', borderTopColor: '#34d399', borderRadius: '999px', display: 'inline-block', animation: 'vc-spin 0.7s linear infinite' }} />
+                        Transcription en cours…
+                      </p>
+                    )}
+
+                    {t.status === 'error' && (
+                      <p style={{ fontSize: '14px', color: '#f87171', margin: 0, lineHeight: 1.6 }}>
+                        Erreur lors de la transcription
+                      </p>
+                    )}
+
+                    {t.status === 'done' && (
+                      <p style={{ fontSize: '14px', color: '#9ca3af', margin: 0, lineHeight: 1.6, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                        {t.text}
+                      </p>
+                    )}
 
                     {t.improved_text && (
                       <div style={{ background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.2)', borderRadius: '10px', padding: '14px', marginTop: '10px' }}>
@@ -264,6 +314,8 @@ export default function AppPage() {
                       </div>
                     )}
 
+                    {t.status === 'done' && (
+                    <>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '14px' }}>
                       <select
                         value={selectedMode}
@@ -312,6 +364,8 @@ export default function AppPage() {
                         </button>
                       )}
                     </div>
+                    </>
+                    )}
 
                     {error && (
                       <p style={{ fontSize: '13px', color: '#f87171', margin: '6px 0 0' }}>
@@ -374,6 +428,8 @@ export default function AppPage() {
 
       <footer style={{ borderTop: '1px solid rgba(255,255,255,0.06)', padding: '20px 24px', marginTop: '16px' }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: '4px 12px', fontSize: '12px', color: '#6b7280' }}>
+          <Link to="/contact" style={{ color: '#6b7280', textDecoration: 'none' }}>Nous contacter</Link>
+          <span>·</span>
           <Link to="/mentions-legales" style={{ color: '#6b7280', textDecoration: 'none' }}>Mentions légales</Link>
           <span>·</span>
           <Link to="/politique-de-confidentialite" style={{ color: '#6b7280', textDecoration: 'none' }}>Politique de confidentialité</Link>

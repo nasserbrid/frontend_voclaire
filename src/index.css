@@ -6,3 +6,4 @@ body { margin: 0; }
 
 @keyframes vc-spin { to { transform: rotate(360deg); } }
 @keyframes vc-fadeup { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes vc-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }

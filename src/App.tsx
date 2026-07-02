@@ -11,6 +11,7 @@ import MentionsLegalesPage from './pages/MentionsLegalesPage'
 import PolitiqueConfidentialitePage from './pages/PolitiqueConfidentialitePage'
 import CguPage from './pages/CguPage'
 import CgvPage from './pages/CgvPage'
+import ContactPage from './pages/ContactPage'
 
 // Lu une seule fois au chargement du module (avant tout montage React/StrictMode)
 const _googleAuthJustCompleted = sessionStorage.getItem('vc:oauth_pending') === '1'
@@ -49,6 +50,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <AppPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/contact"
+            element={
+              <ProtectedRoute>
+                <ContactPage />
               </ProtectedRoute>
             }
           />

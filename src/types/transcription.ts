@@ -7,7 +7,8 @@ export interface StructuredContent {
 
 export interface TranscriptionOut {
   id: string
-  text: string
+  status: string
+  text: string | null
   file_name: string
   file_size: number
   created_at: string

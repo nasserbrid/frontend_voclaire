@@ -30,6 +30,44 @@ export async function getTranscriptions(): Promise<TranscriptionOut[]> {
   return res.json()
 }
 
+export async function getTranscription(id: string): Promise<TranscriptionOut> {
+  const res = await fetch(`${BASE}/transcriptions/${id}`, {
+    credentials: 'include',
+  })
+
+  if (!res.ok) throw new Error(`Erreur ${res.status}`)
+
+  return res.json()
+}
+
+export function pollTranscription(
+  id: string,
+  onUpdate: (t: TranscriptionOut) => void,
+  intervalMs = 2000
+): () => void {
+  let stopped = false
+
+  async function tick() {
+    if (stopped) return
+    try {
+      const t = await getTranscription(id)
+      if (stopped) return
+      onUpdate(t)
+      if (t.status === 'done' || t.status === 'error') return
+    } catch {
+      if (stopped) return
+    }
+    if (!stopped) timer = window.setTimeout(tick, intervalMs)
+  }
+
+  let timer = window.setTimeout(tick, intervalMs)
+
+  return () => {
+    stopped = true
+    clearTimeout(timer)
+  }
+}
+
 export async function improveTranscription(id: string, mode: string): Promise<TranscriptionOut> {
   const res = await fetch(`${BASE}/transcriptions/${id}/improve`, {
     method: 'POST',
