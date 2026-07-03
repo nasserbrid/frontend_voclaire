@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Helmet } from 'react-helmet-async'
 import { useAuth } from '../context/AuthContext'
 import { createCheckout } from '../api/payments'
 
@@ -52,6 +53,10 @@ export default function PricingPage() {
 
   return (
     <div style={{ background: '#030712', color: '#e5e7eb', fontFamily: "'Manrope', sans-serif", minHeight: '100vh' }}>
+      <Helmet>
+        <title>Tarifs Voclaire — Gratuit & Pro | Transcription audio IA</title>
+        <meta name="description" content="Découvrez les tarifs de Voclaire. Plan Free gratuit (60 min/mois) ou Pro à 9,99 €/mois pour la transcription illimitée, l'export PDF/PPTX et le modèle Whisper fine-tuné." />
+      </Helmet>
       <header style={{ padding: '20px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div style={{ width: '30px', height: '30px', borderRadius: '9px', background: 'linear-gradient(140deg,#10b981,#34d399)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px rgba(16,185,129,0.4)' }}>

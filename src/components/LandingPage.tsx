@@ -1,8 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { Helmet } from 'react-helmet-async'
 import { transcribeAudio } from '../api/stt'
 import { getDictaphoneUnsupportedReason } from '../utils/mediaSupport'
 import ReviewsSection from './ReviewsSection'
+
+const faqItems = [
+  { q: 'Voclaire est-il gratuit ?', a: "Plan Free permanent : 60 min/mois, pas de CB. Plan Pro 9,99 €/mois (7,99 €/mois annuel)." },
+  { q: 'Comment transcrire une réunion Google Meet, Teams ou Zoom ?', a: 'Section "Enregistrer une réunion" dans l\'app, sélectionner l\'onglet, cliquer Transcrire.' },
+  { q: 'Quels formats audio sont supportés ?', a: 'MP3, WAV, M4A, OGG, FLAC. Max 30 min (Free) ou 3h (Pro).' },
+  { q: 'Quelle est la précision de la transcription ?', a: 'Whisper large-v3-turbo. Plan Pro = modèle fine-tuné français.' },
+  { q: 'Peut-on exporter en Word, PDF ou PowerPoint ?', a: 'DOCX brut (Free). DOCX + PDF + PPTX structurés (Pro).' },
+  { q: 'Voclaire respecte-t-il le RGPD ?', a: 'Oui, données sécurisées, suppression possible à tout moment, éditeur France.' },
+]
 
 const DEMO_MAX_MINUTES = 10
 
@@ -237,6 +247,10 @@ export default function LandingPage() {
 
   return (
     <div style={{ background: '#030712', color: '#e5e7eb', fontFamily: "'Manrope', sans-serif", minHeight: '100vh', overflowX: 'hidden', position: 'relative' }}>
+      <Helmet>
+        <title>Voclaire — Transcription audio par IA | Gratuit</title>
+        <meta name="description" content="Transcrivez vos réunions, enregistrements et fichiers audio en texte avec Voclaire. Propulsé par Whisper. Gratuit jusqu'à 60 min/mois. Export DOCX, PDF, PowerPoint." />
+      </Helmet>
 
       {/* ambient glow */}
       <div style={{ position: 'absolute', top: '-220px', left: '50%', transform: 'translateX(-50%)', width: '900px', height: '600px', background: 'radial-gradient(ellipse at center, rgba(16,185,129,0.22), transparent 60%)', pointerEvents: 'none', filter: 'blur(20px)', zIndex: 0 }} />
@@ -572,6 +586,21 @@ export default function LandingPage() {
 
       {/* REVIEWS */}
       <ReviewsSection />
+
+      {/* FAQ */}
+      <section style={{ position: 'relative', zIndex: 1, maxWidth: '760px', margin: '0 auto', padding: '50px 24px', background: '#080b16' }}>
+        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+          <h2 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: '34px', letterSpacing: '-0.02em', color: '#fff', margin: 0 }}>Questions fréquentes</h2>
+        </div>
+        <dl>
+          {faqItems.map((item, i) => (
+            <div key={item.q} style={{ padding: '22px 0', borderTop: i === 0 ? 'none' : '1px solid rgba(255,255,255,0.06)' }}>
+              <dt style={{ fontSize: '16px', fontWeight: 700, color: '#fff', margin: '0 0 8px' }}>{item.q}</dt>
+              <dd style={{ fontSize: '15px', color: '#9ca3af', margin: 0, lineHeight: 1.6 }}>{item.a}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
 
       {/* FINAL CTA */}
       <section id="cta" style={{ position: 'relative', zIndex: 1, maxWidth: '1040px', margin: '60px auto 0', padding: '0 24px 90px' }}>
