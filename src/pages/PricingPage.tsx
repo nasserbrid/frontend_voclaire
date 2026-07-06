@@ -54,7 +54,7 @@ export default function PricingPage() {
   return (
     <div style={{ background: '#030712', color: '#e5e7eb', fontFamily: "'Manrope', sans-serif", minHeight: '100vh' }}>
       <Helmet>
-        <title>Tarifs Voclaire — Gratuit & Pro | Transcription audio IA</title>
+        <title>Tarifs Voclaire - Gratuit & Pro | Transcription audio IA</title>
         <meta name="description" content="Découvrez les tarifs de Voclaire. Plan Free gratuit (60 min/mois) ou Pro à 9,99 €/mois pour la transcription illimitée, l'export PDF/PPTX et le modèle Whisper fine-tuné." />
       </Helmet>
       <header style={{ padding: '20px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>

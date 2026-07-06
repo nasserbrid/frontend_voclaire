@@ -248,7 +248,7 @@ export default function LandingPage() {
   return (
     <div style={{ background: '#030712', color: '#e5e7eb', fontFamily: "'Manrope', sans-serif", minHeight: '100vh', overflowX: 'hidden', position: 'relative' }}>
       <Helmet>
-        <title>Voclaire — Transcription audio par IA | Gratuit</title>
+        <title>Voclaire - Transcription audio par IA</title>
         <meta name="description" content="Transcrivez vos réunions, enregistrements et fichiers audio en texte avec Voclaire. Propulsé par Whisper. Gratuit jusqu'à 60 min/mois. Export DOCX, PDF, PowerPoint." />
       </Helmet>
 
