@@ -44,8 +44,8 @@ export default function ReviewsSection() {
                 <span style={{ fontSize: '11px', fontWeight: 700, background: 'rgba(16,185,129,0.2)', color: '#34d399', padding: '3px 8px', borderRadius: '6px', letterSpacing: '0.04em' }}>PRO</span>
               )}
             </div>
-            <p style={{ fontSize: '15px', lineHeight: 1.65, color: '#d1d5db', fontWeight: 500, margin: 0, fontStyle: 'italic', flex: 1 }}>
-              "{review.content}"
+            <p style={{ fontSize: '15px', lineHeight: 1.65, color: '#d1d5db', fontWeight: 500, margin: 0, flex: 1 }}>
+              {review.content}
             </p>
             <div style={{ fontSize: '13px', fontWeight: 600, color: '#6b7280' }}>
               {review.author_name}
