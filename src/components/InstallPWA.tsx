@@ -9,6 +9,16 @@ function ShareIconSVG() {
   )
 }
 
+function MoreIconSVG() {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className="w-7 h-7">
+      <circle cx="5" cy="12" r="1.8" />
+      <circle cx="12" cy="12" r="1.8" />
+      <circle cx="19" cy="12" r="1.8" />
+    </svg>
+  )
+}
+
 function AddToHomeIconSVG() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="w-7 h-7">
@@ -28,7 +38,9 @@ function IOSInstallGuide({ onDismiss }: { onDismiss: () => void }) {
           <div>
             <p className="text-white font-semibold text-base">Installer Voclaire</p>
             <p className="text-slate-400 text-sm mt-0.5">
-              Accédez à l'app depuis votre écran d'accueil
+              Ouvrez{' '}
+              <span className="text-emerald-400 font-medium">voclaire.fr depuis Safari</span>
+              {' '}pour installer l'app
             </p>
           </div>
           <button
@@ -47,9 +59,22 @@ function IOSInstallGuide({ onDismiss }: { onDismiss: () => void }) {
           <div>
             <p className="text-white text-sm font-medium">Étape 1</p>
             <p className="text-slate-300 text-sm">
-              Tapez l'icône{' '}
-              <span className="text-emerald-400 font-medium">Partager</span>
-              {' '}en bas de Safari
+              Appuyez sur{' '}
+              <span className="text-emerald-400 font-medium">Télécharger</span>
+              {' '}(icône de partage) en bas de Safari
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 bg-slate-800/70 rounded-xl px-4 py-3 mb-2">
+          <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-400">
+            <MoreIconSVG />
+          </div>
+          <div>
+            <p className="text-white text-sm font-medium">Étape 2</p>
+            <p className="text-slate-300 text-sm">
+              Appuyez sur{' '}
+              <span className="text-emerald-400 font-medium">« En voir plus »</span>
             </p>
           </div>
         </div>
@@ -59,11 +84,11 @@ function IOSInstallGuide({ onDismiss }: { onDismiss: () => void }) {
             <AddToHomeIconSVG />
           </div>
           <div>
-            <p className="text-white text-sm font-medium">Étape 2</p>
+            <p className="text-white text-sm font-medium">Étape 3</p>
             <p className="text-slate-300 text-sm">
-              Sélectionnez{' '}
+              Appuyez sur{' '}
               <span className="text-emerald-400 font-medium">
-                « Ajouter à l'écran d'accueil »
+                « Sur l'écran d'accueil »
               </span>
             </p>
           </div>
