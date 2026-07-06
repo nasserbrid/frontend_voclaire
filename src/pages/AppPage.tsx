@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import SttForm from '../components/SttForm'
 import Dictaphone from '../components/Dictaphone'
 import TermsModal from '../components/TermsModal'
+import { InstallPWAButton } from '../components/InstallPWA'
 import { getTranscriptions, deleteTranscription, improveTranscription, exportTranscription, downloadBlob, pollTranscription } from '../api/transcriptions'
 import { createPortalSession } from '../api/payments'
 import { submitReview } from '../api/reviews'
@@ -170,6 +171,7 @@ export default function AppPage() {
                 )}
               </p>
             </div>
+            <InstallPWAButton />
             {user?.plan === 'pro' && (
               <button
                 onClick={handleManageSubscription}
