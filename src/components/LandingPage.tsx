@@ -288,6 +288,10 @@ export default function LandingPage() {
           <a href="#pricing" style={{ color: '#e5e7eb', textDecoration: 'none', padding: '15px 24px', borderRadius: '12px', fontSize: '16px', fontWeight: 600, border: '1px solid rgba(255,255,255,0.12)' }}>Voir les tarifs</a>
         </div>
         <p style={{ fontSize: '13.5px', color: '#6b7280', marginTop: '22px', fontWeight: 500 }}>Aucune carte bancaire requise · Premier essai gratuit en bas de page</p>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '7px', marginTop: '16px', padding: '7px 16px', borderRadius: '999px', background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.25)' }}>
+          <span style={{ fontSize: '14px' }}>📲</span>
+          <span style={{ fontSize: '13px', color: '#a7f3d0', fontWeight: 600 }}>Installable sur votre téléphone comme une vraie app — connexion requise</span>
+        </div>
       </section>
 
       {/* DEMO DICTAPHONE */}
