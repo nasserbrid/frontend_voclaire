@@ -637,8 +637,8 @@ export default function LandingPage() {
               <Link to="/politique-de-confidentialite" style={{ color: '#9ca3af', textDecoration: 'none' }}>Confidentialité</Link>
               <Link to="/cgu" style={{ color: '#9ca3af', textDecoration: 'none' }}>CGU</Link>
               <Link to="/cgv" style={{ color: '#9ca3af', textDecoration: 'none' }}>CGV</Link>
-              <Link to="/login" style={{ color: '#9ca3af', textDecoration: 'none' }}>Connexion</Link>
-              <Link to="/register" style={{ color: '#9ca3af', textDecoration: 'none' }}>S'inscrire</Link>
+              {/* <Link to="/login" style={{ color: '#9ca3af', textDecoration: 'none' }}>Connexion</Link>
+              <Link to="/register" style={{ color: '#9ca3af', textDecoration: 'none' }}>S'inscrire</Link> */}
             </div>
             <div style={{ fontSize: '13.5px', color: '#6b7280', fontWeight: 500 }}>© 2026 voclaire</div>
           </div>
