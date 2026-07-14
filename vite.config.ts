@@ -11,7 +11,7 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'apple-touch-icon-180.png'],
+      includeAssets: ['favicon.svg', 'apple-touch-icon-180x180.png'],
       manifest: {
         name: 'Voclaire — Transcription audio IA',
         short_name: 'Voclaire',
@@ -24,15 +24,24 @@ export default defineConfig({
         start_url: '/',
         lang: 'fr',
         icons: [
-          { src: '/pwa-64.png', sizes: '64x64', type: 'image/png' },
-          { src: '/pwa-192.png', sizes: '192x192', type: 'image/png' },
-          { src: '/pwa-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
-          { src: '/maskable-icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+          { src: '/pwa-64x64.png', sizes: '64x64', type: 'image/png' },
+          { src: '/pwa-192x192.png', sizes: '192x192', type: 'image/png' },
+          { src: '/pwa-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+          { src: '/maskable-icon-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        cleanupOutdatedCaches: true,
+        globPatterns: ['**/*.{js,css,ico,png,svg,woff2}'],
         runtimeCaching: [
+          {
+            urlPattern: ({ request }) => request.mode === 'navigate',
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'html-cache',
+              expiration: { maxEntries: 5, maxAgeSeconds: 3600 },
+            },
+          },
           {
             urlPattern: /^https:\/\/api\.voclaire\.fr\/.*/i,
             handler: 'NetworkFirst',
