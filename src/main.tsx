@@ -4,6 +4,16 @@ import { HelmetProvider } from 'react-helmet-async'
 import './index.css'
 import App from './App.tsx'
 
+if ('serviceWorker' in navigator) {
+  let refreshing = false
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!refreshing) {
+      refreshing = true
+      window.location.reload()
+    }
+  })
+}
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <HelmetProvider>
