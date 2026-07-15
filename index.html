@@ -11,6 +11,27 @@
     <meta name="apple-mobile-web-app-title" content="Voclaire" />
     <link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png" />
     <title>Voclaire - Transcription audio par IA</title>
+    <style>
+      html, body { background: #030712; margin: 0; }
+      #root:empty {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+      }
+      #root:empty::after {
+        content: "";
+        width: 40px;
+        height: 40px;
+        border: 3px solid rgba(16, 185, 129, 0.25);
+        border-top-color: #10b981;
+        border-radius: 50%;
+        animation: vc-boot-spin 0.8s linear infinite;
+      }
+      @keyframes vc-boot-spin {
+        to { transform: rotate(360deg); }
+      }
+    </style>
     <meta
       name="description"
       content="Transcrivez vos réunions, enregistrements et fichiers audio en texte avec Voclaire. Propulsé par Whisper. Gratuit jusqu'à 60 min/mois. Export DOCX, PDF, PowerPoint."
