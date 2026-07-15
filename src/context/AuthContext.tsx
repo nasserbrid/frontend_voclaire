@@ -6,7 +6,7 @@ interface AuthContextValue {
   user: UserOut | null
   loading: boolean
   setUser: (user: UserOut | null) => void
-  logout: () => Promise<void>
+  logout: () => void
   refreshUser: () => Promise<void>
 }
 
@@ -26,8 +26,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .finally(() => setLoading(false))
   }, [])
 
-  async function logout() {
-    await apiLogout()
+  function logout() {
+    apiLogout().catch(() => {})
     setUser(null)
   }
 

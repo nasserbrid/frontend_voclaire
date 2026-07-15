@@ -68,8 +68,8 @@ export default function AppPage() {
     return () => stopFns.forEach((stop) => stop())
   }, [user])
 
-  async function handleLogout() {
-    await logout()
+  function handleLogout() {
+    logout()
     navigate('/')
   }
 
