@@ -6,8 +6,9 @@ import App from './App.tsx'
 
 if ('serviceWorker' in navigator) {
   let refreshing = false
+  const hadController = !!navigator.serviceWorker.controller
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (!refreshing) {
+    if (!refreshing && hadController) {
       refreshing = true
       window.location.reload()
     }
