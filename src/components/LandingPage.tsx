@@ -5,6 +5,8 @@ import { transcribeAudio } from '../api/stt'
 import { getDictaphoneUnsupportedReason } from '../utils/mediaSupport'
 import ReviewsSection from './ReviewsSection'
 
+const MAINTENANCE_MODE = true
+
 const faqItems = [
   { q: 'Voclaire est-il gratuit ?', a: "Plan Free permanent : 60 min/mois, pas de CB. Plan Pro 9,99 €/mois (7,99 €/mois annuel)." },
   { q: 'Comment transcrire une réunion Google Meet, Teams ou Zoom ?', a: 'Section "Enregistrer une réunion" dans l\'app, sélectionner l\'onglet, cliquer Transcrire.' },
@@ -247,6 +249,11 @@ export default function LandingPage() {
 
   return (
     <div style={{ background: '#030712', color: '#e5e7eb', fontFamily: "'Manrope', sans-serif", minHeight: '100vh', overflowX: 'hidden', position: 'relative' }}>
+      {MAINTENANCE_MODE && (
+        <div className="w-full bg-amber-400 text-black text-sm font-medium py-2 px-4 text-center">
+          🔧 Maintenance en cours — les transcriptions sont temporairement indisponibles. Merci pour votre patience.
+        </div>
+      )}
       <Helmet>
         <title>Voclaire - Transcription audio par IA</title>
         <meta name="description" content="Transcrivez vos réunions, enregistrements et fichiers audio en texte avec Voclaire. Propulsé par Whisper. Gratuit jusqu'à 60 min/mois. Export DOCX, PDF, PowerPoint." />
