@@ -9,6 +9,8 @@ import { createPortalSession } from '../api/payments'
 import { submitReview } from '../api/reviews'
 import type { TranscriptionOut } from '../types/transcription'
 
+const MAINTENANCE_MODE = true
+
 export default function AppPage() {
   'use no memo'
   const { user, logout, refreshUser } = useAuth()
@@ -139,6 +141,11 @@ export default function AppPage() {
 
   return (
     <div style={{ background: '#030712', color: '#e5e7eb', fontFamily: "'Manrope', sans-serif", minHeight: '100vh' }}>
+      {MAINTENANCE_MODE && (
+        <div className="w-full bg-amber-400 text-black text-sm font-medium py-2 px-4 text-center">
+          🔧 Maintenance en cours — les transcriptions sont temporairement indisponibles. Merci pour votre patience.
+        </div>
+      )}
       {!termsAccepted && (
         <TermsModal onAccepted={() => setTermsAccepted(true)} />
       )}
