@@ -8,12 +8,12 @@ import ReviewsSection from './ReviewsSection'
 const MAINTENANCE_MODE = true
 
 const faqItems = [
-  { q: 'Voclaire est-il gratuit ?', a: "Plan Free permanent : 60 min/mois, pas de CB. Plan Pro 9,99 €/mois (7,99 €/mois annuel)." },
-  { q: 'Comment transcrire une réunion Google Meet, Teams ou Zoom ?', a: 'Section "Enregistrer une réunion" dans l\'app, sélectionner l\'onglet, cliquer Transcrire.' },
-  { q: 'Quels formats audio sont supportés ?', a: 'MP3, WAV, M4A, OGG, FLAC. Max 30 min (Free) ou 3h (Pro).' },
-  { q: 'Quelle est la précision de la transcription ?', a: 'Whisper large-v3-turbo. Plan Pro = modèle fine-tuné français.' },
-  { q: 'Peut-on exporter en Word, PDF ou PowerPoint ?', a: 'DOCX brut (Free). DOCX + PDF + PPTX structurés (Pro).' },
-  { q: 'Voclaire respecte-t-il le RGPD ?', a: 'Oui, données sécurisées, suppression possible à tout moment, éditeur France.' },
+  { q: 'Où sont stockées mes données ?', a: "Vos fichiers audio et transcriptions sont hébergés sur des serveurs en France car rien n'est transmis à des services étrangers." },
+  { q: 'Comment fonctionne l\'enregistrement de réunion ?', a: "Depuis votre navigateur, cliquez sur Démarrer l'enregistrement pendant une réunion Teams, Zoom ou Google Meet. Voclaire capture l'audio de tous les participants et génère la transcription automatiquement. L'offre Free permet d'enregistrer jusqu'à 10 minutes par session et l'offre Pro jusqu'à 30 minutes." },
+  { q: "Comment fonctionne la transcription d'un fichier audio ?", a: "Déposez directement un fichier audio depuis votre PC ou smartphone (MP3, MP4, M4A, WAV et autres formats courants). Voclaire transcrit le contenu et identifie automatiquement les différents interlocuteurs. L'offre Free accepte les fichiers jusqu'à 30 minutes et l'offre Pro les fichiers déposés jusqu'à 3 heures." },
+  { q: "Comment fonctionne l'identification des interlocuteurs ?", a: "Voclaire détecte automatiquement les changements de locuteur et attribue chaque prise de parole à un interlocuteur distinct. Cette fonctionnalité est incluse dans les deux offres." },
+  { q: 'Quelle est la limite gratuite ?', a: "Avec l'offre Free vous disposez de 60 minutes de transcription au total par mois. Un enregistrement de réunion est limité à 10 minutes et un fichier déposé à 30 minutes. Avec l'offre Pro le volume est illimité, les enregistrements vont jusqu'à 30 minutes par session et les fichiers déposés jusqu'à 3h." },
+  { q: 'Puis-je transcrire une réunion de 2h ?', a: "Oui, avec l'offre Pro : les fichiers déposés jusqu'à 3h sont acceptés et le volume mensuel est illimité." },
 ]
 
 const DEMO_MAX_MINUTES = 10
@@ -24,41 +24,34 @@ const steps = [
   { num: '03', title: 'Récupérez le texte', body: "Copiez, exportez en DOCX/PDF/PPTX, ou affinez avec la correction et la reformulation IA." },
 ]
 
+const trustPoints = [
+  { icon: '🇫🇷', title: 'Données en France', body: 'Vos audios ne quittent jamais les serveurs français.' },
+  { icon: '🗣️', title: 'Qui a dit quoi', body: 'Chaque prise de parole est identifiée et attribuée automatiquement.' },
+  { icon: '🎙️', title: 'Réunion ou fichier', body: 'Enregistrez en direct depuis Teams, Zoom ou Google Meet, ou déposez un fichier audio existant.' },
+]
+
 const freeFeatures = [
-  '60 min de transcription / mois',
-  'Fichier audio max 30 min',
-  'Enregistrement réunion max 10 min',
-  'Modèle Whisper haute précision',
-  '10 améliorations LLM / mois',
-  'Export DOCX (texte brut)',
+  'Enregistrement de réunion : 10 min par session',
+  "Transcription de fichier audio : fichiers jusqu'à 30 min",
+  'Volume mensuel : 60 min de transcription au total',
+  'Identification automatique des interlocuteurs (qui a dit quoi)',
+  "Amélioration du texte par IA : 10 fois par mois (correction, reformulation, résumé)",
+  'Téléchargement en Word (.docx)',
+  'Vos données traitées et stockées en France',
 ]
 
 const proFeatures = [
-  "Transcription illimitée (fichiers jusqu'à 3h)",
-  "Enregistrement réunion jusqu'à 30 min",
-  'LLM illimité (correction, reformulation, résumé)',
-  'Modèle Whisper fine-tuné français',
-  'Export Word, PDF et PowerPoint structurés',
-  'Transcription de réunion structurée',
-  'Historique et sauvegarde illimités',
+  'Enregistrement de réunion : jusqu\'à 30 min par session',
+  "Transcription de fichier audio : fichiers déposés jusqu'à 3h",
+  'Volume mensuel : illimité',
+  'Identification automatique des interlocuteurs (qui a dit quoi)',
+  'Amélioration du texte par IA : illimitée',
+  'Téléchargement en Word, PDF ou PowerPoint avec mise en forme structurée',
+  'Vos données traitées et stockées en France',
 ]
 
-const freePlan = [
-  '60 min de transcription / mois',
-  'Fichier audio max 30 min',
-  'Enregistrement réunion max 10 min',
-  '10 améliorations LLM / mois',
-  'Export DOCX (texte brut)',
-]
-const proPlan = [
-  "Transcription illimitée (fichiers jusqu'à 3h)",
-  "Enregistrement réunion jusqu'à 30 min",
-  'LLM illimité (correction, reformulation, résumé)',
-  'Modèle Whisper fine-tuné français',
-  'Export Word, PDF et PowerPoint structurés',
-  'Transcription de réunion structurée',
-  'Résiliation en 1 clic',
-]
+const freePlan = freeFeatures
+const proPlan = proFeatures
 
 export default function LandingPage() {
   const [file, setFile] = useState<File | null>(null)
@@ -282,11 +275,11 @@ export default function LandingPage() {
       {/* HERO */}
       <section style={{ position: 'relative', zIndex: 1, maxWidth: '880px', margin: '0 auto', padding: '96px 24px 60px', textAlign: 'center' }}>
         <h1 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 800, fontSize: '60px', lineHeight: 1.04, letterSpacing: '-0.03em', color: '#fff', margin: '0 0 22px' }}>
-          Votre audio en texte,<br />
-          <span style={{ background: 'linear-gradient(120deg,#34d399,#10b981)', WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>en quelques secondes.</span>
+          Votre réunion Teams, Zoom ou Meet,<br />
+          <span style={{ background: 'linear-gradient(120deg,#34d399,#10b981)', WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>transcrite en quelques secondes.</span>
         </h1>
         <p style={{ fontSize: '19px', lineHeight: 1.6, color: '#9ca3af', maxWidth: '560px', margin: '0 auto 38px', fontWeight: 500 }}>
-          Déposez un fichier audio, obtenez une transcription précise instantanément. Sans compte, sans installation. Corrigez et reformulez ensuite avec l'IA.
+          Enregistrez votre réunion depuis le navigateur : Voclaire capture tous les participants, transcrit automatiquement et identifie qui a dit quoi. Sans compte, sans installation.
         </p>
         <div style={{ display: 'flex', gap: '14px', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
           <a href="#demo" onClick={scrollToDemo} style={{ background: '#10b981', color: '#fff', textDecoration: 'none', padding: '15px 30px', borderRadius: '12px', fontSize: '16px', fontWeight: 700, boxShadow: '0 8px 28px rgba(16,185,129,0.45)', display: 'inline-flex', alignItems: 'center', gap: '9px' }}>
@@ -297,12 +290,25 @@ export default function LandingPage() {
         <p style={{ fontSize: '13.5px', color: '#6b7280', marginTop: '22px', fontWeight: 500 }}>Aucune carte bancaire requise · Premier essai gratuit en bas de page</p>
       </section>
 
+      {/* TRUST POINTS */}
+      <section style={{ position: 'relative', zIndex: 1, maxWidth: '1040px', margin: '0 auto', padding: '0 24px 60px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '20px' }}>
+          {trustPoints.map(point => (
+            <div key={point.title} style={{ background: 'linear-gradient(180deg,rgba(255,255,255,0.03),transparent)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '18px', padding: '24px', textAlign: 'center' }}>
+              <div style={{ fontSize: '28px', marginBottom: '12px' }}>{point.icon}</div>
+              <div style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: '16px', color: '#fff', marginBottom: '6px' }}>{point.title}</div>
+              <div style={{ fontSize: '14px', lineHeight: 1.5, color: '#9ca3af', fontWeight: 500 }}>{point.body}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* DEMO DICTAPHONE */}
       <section id="demo" style={{ position: 'relative', zIndex: 1, maxWidth: '760px', margin: '0 auto', padding: '40px 24px 60px' }}>
         <div style={{ textAlign: 'center', marginBottom: '30px' }}>
           <div style={{ fontSize: '13px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#34d399', marginBottom: '12px' }}>Démo en direct</div>
           <h2 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: '34px', letterSpacing: '-0.02em', color: '#fff', margin: '0 0 10px' }}>Enregistrez votre réunion</h2>
-          <p style={{ color: '#9ca3af', fontSize: '16px', margin: 0, fontWeight: 500 }}>Capturez l'audio de Google Meet, Teams ou Zoom directement depuis le navigateur.</p>
+          <p style={{ color: '#9ca3af', fontSize: '16px', margin: '0 auto', maxWidth: '560px', fontWeight: 500 }}>Lancez l'enregistrement depuis votre navigateur pendant une réunion Teams, Zoom ou Google Meet. Voclaire capture l'audio de tous les participants et génère la transcription automatiquement.</p>
         </div>
 
         <div style={{ background: 'linear-gradient(180deg,#0b1020,#080b16)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '28px', boxShadow: '0 24px 60px rgba(0,0,0,0.5)' }}>
