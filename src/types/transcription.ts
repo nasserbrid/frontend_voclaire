@@ -5,6 +5,13 @@ export interface StructuredContent {
   conclusion: string
 }
 
+export interface TranscriptionSegment {
+  speaker: string
+  text: string
+  start: number
+  end: number
+}
+
 export interface TranscriptionOut {
   id: string
   status: string
@@ -14,4 +21,5 @@ export interface TranscriptionOut {
   created_at: string
   improved_text?: string
   structured_content?: StructuredContent
+  segments?: TranscriptionSegment[]
 }

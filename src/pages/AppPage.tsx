@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import SttForm from '../components/SttForm'
 import Dictaphone from '../components/Dictaphone'
 import TermsModal from '../components/TermsModal'
+import DiarizedTranscript from '../components/DiarizedTranscript'
 import { getTranscriptions, deleteTranscription, improveTranscription, exportTranscription, downloadBlob, pollTranscription } from '../api/transcriptions'
 import { createPortalSession } from '../api/payments'
 import { submitReview } from '../api/reviews'
@@ -280,7 +281,11 @@ export default function AppPage() {
                       </p>
                     )}
 
-                    {t.status === 'done' && (
+                    {t.status === 'done' && t.segments && t.segments.length > 0 && (
+                      <DiarizedTranscript segments={t.segments} />
+                    )}
+
+                    {t.status === 'done' && (!t.segments || t.segments.length === 0) && (
                       <p style={{ fontSize: '14px', color: '#9ca3af', margin: 0, lineHeight: 1.6, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
                         {t.text}
                       </p>
