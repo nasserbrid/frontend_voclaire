@@ -5,7 +5,7 @@ import { transcribeAudio } from '../api/stt'
 import { getDictaphoneUnsupportedReason } from '../utils/mediaSupport'
 import ReviewsSection from './ReviewsSection'
 
-const MAINTENANCE_MODE = true
+const MAINTENANCE_MODE = false
 
 const faqItems = [
   { q: 'Où sont stockées mes données ?', a: "Vos fichiers audio et transcriptions sont hébergés sur des serveurs en France car rien n'est transmis à des services étrangers." },

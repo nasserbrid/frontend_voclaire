@@ -10,7 +10,7 @@ import { createPortalSession } from '../api/payments'
 import { submitReview } from '../api/reviews'
 import type { TranscriptionOut } from '../types/transcription'
 
-const MAINTENANCE_MODE = true
+const MAINTENANCE_MODE = false
 
 export default function AppPage() {
   'use no memo'
