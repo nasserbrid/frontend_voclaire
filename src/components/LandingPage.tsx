@@ -70,6 +70,7 @@ export default function LandingPage() {
   const [demoError, setDemoError] = useState<string | null>(null)
   const [demoMicWarning, setDemoMicWarning] = useState<string | null>(null)
   const [demoUnsupportedReason] = useState(getDictaphoneUnsupportedReason)
+  const [showDemoGate, setShowDemoGate] = useState(false)
 
   const demoMediaRecorderRef = useRef<MediaRecorder | null>(null)
   const demoChunksRef = useRef<Blob[]>([])
@@ -176,6 +177,7 @@ export default function LandingPage() {
     try {
       const text = await transcribeAudio(demoAudioFile)
       setDemoTranscript(text)
+      setShowDemoGate(true)
     } catch (err) {
       setDemoError(err instanceof Error ? err.message : 'Erreur lors de la transcription')
     } finally {
@@ -419,6 +421,53 @@ export default function LandingPage() {
                 <a href="#cta" style={{ background: '#10b981', color: '#fff', textDecoration: 'none', padding: '9px 16px', borderRadius: '10px', fontSize: '13.5px', fontWeight: 700, whiteSpace: 'nowrap' }}>Débloquer</a>
               </div>
             </div>
+          )}
+
+          {demoTranscript && showDemoGate && (
+            <>
+              <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 1000 }} />
+              <div
+                style={{
+                  position: 'fixed',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  zIndex: 1000,
+                  width: 'min(420px, calc(100vw - 32px))',
+                  background: '#080b16',
+                  border: '1px solid rgba(16,185,129,0.3)',
+                  borderRadius: '20px',
+                  padding: '32px 28px',
+                  textAlign: 'center',
+                  boxShadow: '0 24px 64px rgba(0,0,0,0.5)',
+                }}
+              >
+                <div style={{ fontFamily: "'Sora', sans-serif", fontSize: '22px', fontWeight: 800, color: '#fff', marginBottom: '10px' }}>
+                  Votre transcription est prête !
+                </div>
+                <div style={{ fontSize: '14.5px', color: '#9ca3af', fontWeight: 500, lineHeight: 1.6, marginBottom: '26px' }}>
+                  Créez votre compte gratuit pour la lire — 60 min/mois, sans carte bancaire.
+                </div>
+                <Link
+                  to="/register"
+                  style={{ display: 'block', background: '#10b981', color: '#fff', textDecoration: 'none', padding: '14px', borderRadius: '12px', fontSize: '15px', fontWeight: 700, boxShadow: '0 8px 24px rgba(16,185,129,0.4)', marginBottom: '14px' }}
+                >
+                  Créer mon compte gratuit
+                </Link>
+                <Link
+                  to="/login"
+                  style={{ display: 'block', color: '#d1d5db', textDecoration: 'none', fontSize: '14px', fontWeight: 600, marginBottom: '18px' }}
+                >
+                  J'ai déjà un compte
+                </Link>
+                <button
+                  onClick={() => setShowDemoGate(false)}
+                  style={{ background: 'transparent', border: 'none', color: '#6b7280', fontSize: '12.5px', fontWeight: 500, cursor: 'pointer', textDecoration: 'underline' }}
+                >
+                  Non merci, voir quand même
+                </button>
+              </div>
+            </>
           )}
           </>
           )}
