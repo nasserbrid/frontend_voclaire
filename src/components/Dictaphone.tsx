@@ -125,7 +125,7 @@ export default function Dictaphone({ onTranscribed, maxMinutes }: DictaphoneProp
     setError(null)
     setTranscript(null)
     try {
-      const result = await transcribeAudio(audioFile)
+      const result = await transcribeAudio(audioFile, elapsed)
 
       if (result.status === 'processing') {
         stopPollRef.current = pollTranscription(result.id, (t) => {

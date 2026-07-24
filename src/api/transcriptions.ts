@@ -2,13 +2,24 @@ import type { TranscriptionOut } from '../types/transcription'
 
 const BASE = import.meta.env.VITE_BACKEND_VOCLAIRE_URL
 
-export async function transcribeAudio(file: File): Promise<TranscriptionOut> {
-  const body = new FormData()
-  body.append('file', file)
+interface PresignResponse {
+  upload_url: string
+  r2_key: string
+}
 
-  const res = await fetch(`${BASE}/transcriptions`, {
+interface ConfirmParams {
+  r2_key: string
+  file_name: string
+  content_type: string
+  file_size: number
+  duration_seconds: number
+}
+
+async function presignUpload(fileName: string, contentType: string): Promise<PresignResponse> {
+  const res = await fetch(`${BASE}/transcriptions/presign`, {
     method: 'POST',
-    body,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ file_name: fileName, content_type: contentType }),
     credentials: 'include',
   })
 
@@ -18,6 +29,78 @@ export async function transcribeAudio(file: File): Promise<TranscriptionOut> {
   }
 
   return res.json()
+}
+
+async function uploadToR2(uploadUrl: string, file: File): Promise<void> {
+  // Pas de credentials: 'include' ici — c'est une URL Cloudflare R2, pas notre backend,
+  // le cookie JWT n'a rien à y faire.
+  const res = await fetch(uploadUrl, {
+    method: 'PUT',
+    headers: { 'Content-Type': file.type || 'audio/mpeg' },
+    body: file,
+  })
+
+  if (!res.ok) {
+    throw new Error("Échec de l'envoi du fichier audio.")
+  }
+}
+
+async function confirmTranscription(params: ConfirmParams): Promise<TranscriptionOut> {
+  const res = await fetch(`${BASE}/transcriptions/confirm`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(params),
+    credentials: 'include',
+  })
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}))
+    throw new Error(data.detail ?? `Erreur ${res.status}`)
+  }
+
+  return res.json()
+}
+
+function getAudioDurationSeconds(file: File): Promise<number> {
+  // Lecture des métadonnées via un <audio> caché — léger, pas de décodage complet en
+  // mémoire (important pour les gros fichiers Pro, jusqu'à 3h).
+  return new Promise((resolve, reject) => {
+    const audio = document.createElement('audio')
+    const url = URL.createObjectURL(file)
+    audio.preload = 'metadata'
+    audio.onloadedmetadata = () => {
+      URL.revokeObjectURL(url)
+      resolve(audio.duration)
+    }
+    audio.onerror = () => {
+      URL.revokeObjectURL(url)
+      reject(new Error("Impossible de lire la durée du fichier audio."))
+    }
+    audio.src = url
+  })
+}
+
+export async function transcribeAudio(
+  file: File,
+  knownDurationSeconds?: number
+): Promise<TranscriptionOut> {
+  // knownDurationSeconds : permet à un appelant qui connaît déjà la durée exacte
+  // (ex: Dictaphone, qui a son propre timer) de l'utiliser directement plutôt que
+  // de la redétecter via <audio> — évite une détection peu fiable sur les
+  // blobs webm produits par MediaRecorder.
+  const durationSeconds = knownDurationSeconds ?? (await getAudioDurationSeconds(file))
+  const contentType = file.type || 'audio/mpeg'
+
+  const { upload_url, r2_key } = await presignUpload(file.name, contentType)
+  await uploadToR2(upload_url, file)
+
+  return confirmTranscription({
+    r2_key,
+    file_name: file.name,
+    content_type: contentType,
+    file_size: file.size,
+    duration_seconds: durationSeconds,
+  })
 }
 
 export async function getTranscriptions(): Promise<TranscriptionOut[]> {
