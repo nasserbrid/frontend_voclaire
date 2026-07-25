@@ -13,6 +13,7 @@ interface ConfirmParams {
   content_type: string
   file_size: number
   duration_seconds: number
+  source: 'file' | 'recording'
 }
 
 async function presignUpload(fileName: string, contentType: string): Promise<PresignResponse> {
@@ -82,7 +83,8 @@ function getAudioDurationSeconds(file: File): Promise<number> {
 
 export async function transcribeAudio(
   file: File,
-  knownDurationSeconds?: number
+  knownDurationSeconds?: number,
+  source: 'file' | 'recording' = 'file'
 ): Promise<TranscriptionOut> {
   // knownDurationSeconds : permet à un appelant qui connaît déjà la durée exacte
   // (ex: Dictaphone, qui a son propre timer) de l'utiliser directement plutôt que
@@ -100,6 +102,7 @@ export async function transcribeAudio(
     content_type: contentType,
     file_size: file.size,
     duration_seconds: durationSeconds,
+    source,
   })
 }
 
