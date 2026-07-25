@@ -9,11 +9,11 @@ const MAINTENANCE_MODE = false
 
 const faqItems = [
   { q: 'Où sont stockées mes données ?', a: "Vos fichiers audio et transcriptions sont hébergés sur des serveurs en France car rien n'est transmis à des services étrangers." },
-  { q: 'Comment fonctionne l\'enregistrement de réunion ?', a: "Depuis votre navigateur, cliquez sur Démarrer l'enregistrement pendant une réunion Teams, Zoom ou Google Meet. Voclaire capture l'audio de tous les participants et génère la transcription automatiquement. L'offre Free permet d'enregistrer jusqu'à 10 minutes par session et l'offre Pro jusqu'à 30 minutes." },
-  { q: "Comment fonctionne la transcription d'un fichier audio ?", a: "Déposez directement un fichier audio depuis votre PC ou smartphone (MP3, MP4, M4A, WAV et autres formats courants). Voclaire transcrit le contenu et identifie automatiquement les différents interlocuteurs. L'offre Free accepte les fichiers jusqu'à 30 minutes et l'offre Pro les fichiers déposés jusqu'à 3 heures." },
+  { q: 'Comment fonctionne l\'enregistrement de réunion ?', a: "Depuis votre navigateur, cliquez sur Démarrer l'enregistrement pendant une réunion Teams, Zoom ou Google Meet. Voclaire capture l'audio de tous les participants et génère la transcription automatiquement. L'offre Free permet d'enregistrer jusqu'à 2h par réunion, dans la limite de 4h par mois au total. L'offre Pro est illimitée." },
+  { q: "Comment fonctionne la transcription d'un fichier audio ?", a: "Déposez directement un fichier audio depuis votre PC ou smartphone (MP3, MP4, M4A, WAV et autres formats courants). Voclaire transcrit le contenu et identifie automatiquement les différents interlocuteurs. L'offre Free accepte les fichiers jusqu'à 2h chacun, dans la limite de 4h par mois au total. L'offre Pro est illimitée." },
   { q: "Comment fonctionne l'identification des interlocuteurs ?", a: "Voclaire détecte automatiquement les changements de locuteur et attribue chaque prise de parole à un interlocuteur distinct. Cette fonctionnalité est incluse dans les deux offres." },
-  { q: 'Quelle est la limite gratuite ?', a: "Avec l'offre Free vous disposez de 60 minutes de transcription au total par mois. Un enregistrement de réunion est limité à 10 minutes et un fichier déposé à 30 minutes. Avec l'offre Pro le volume est illimité, les enregistrements vont jusqu'à 30 minutes par session et les fichiers déposés jusqu'à 3h." },
-  { q: 'Puis-je transcrire une réunion de 2h ?', a: "Oui, avec l'offre Pro : les fichiers déposés jusqu'à 3h sont acceptés et le volume mensuel est illimité." },
+  { q: 'Quelle est la limite gratuite ?', a: "Avec l'offre Free, vous disposez de deux quotas séparés chaque mois : 4h pour vos fichiers audio et 4h pour vos enregistrements de réunion. Chaque fichier ou réunion peut durer jusqu'à 2h. Concrètement : par exemple 2 fichiers de 2h et 2 réunions de 2h, gratuitement, chaque mois. Avec l'offre Pro, tout est illimité : ni plafond par fichier/réunion, ni volume mensuel." },
+  { q: 'Puis-je transcrire une réunion de 2h ?', a: "Oui, même avec l'offre Free : 2h par réunion ou par fichier est justement la durée maximale acceptée gratuitement. Au-delà de 2h pour un seul élément, il faut passer à l'offre Pro, qui n'a aucune limite de durée." },
 ]
 
 const DEMO_MAX_MINUTES = 10
@@ -31,9 +31,8 @@ const trustPoints = [
 ]
 
 const freeFeatures = [
-  'Enregistrement de réunion : 10 min par session',
-  "Transcription de fichier audio : fichiers jusqu'à 30 min",
-  'Volume mensuel : 60 min de transcription au total',
+  'Transcription de fichiers audio : 4h par mois (jusqu\'à 2h par fichier)',
+  'Enregistrement de réunion : 4h par mois (jusqu\'à 2h par réunion)',
   'Identification automatique des interlocuteurs (qui a dit quoi)',
   "Amélioration du texte par IA : 10 fois par mois (correction, reformulation, résumé)",
   'Téléchargement en Word (.docx)',
@@ -41,9 +40,8 @@ const freeFeatures = [
 ]
 
 const proFeatures = [
-  'Enregistrement de réunion : jusqu\'à 30 min par session',
-  "Transcription de fichier audio : fichiers déposés jusqu'à 3h",
-  'Volume mensuel : illimité',
+  'Transcription de fichiers audio : illimité',
+  'Enregistrement de réunion : illimité',
   'Identification automatique des interlocuteurs (qui a dit quoi)',
   'Amélioration du texte par IA : illimitée',
   'Téléchargement en Word, PDF ou PowerPoint avec mise en forme structurée',
@@ -251,7 +249,7 @@ export default function LandingPage() {
       )}
       <Helmet>
         <title>Voclaire - Transcription audio par IA</title>
-        <meta name="description" content="Transcrivez vos réunions, enregistrements et fichiers audio en texte avec Voclaire. Propulsé par Whisper. Gratuit jusqu'à 60 min/mois. Export DOCX, PDF, PowerPoint." />
+        <meta name="description" content="Transcrivez vos réunions, enregistrements et fichiers audio en texte avec Voclaire. Propulsé par Whisper. Gratuit jusqu'à 4h/mois par catégorie (fichiers et réunions). Export DOCX, PDF, PowerPoint." />
       </Helmet>
 
       {/* ambient glow */}
@@ -446,7 +444,7 @@ export default function LandingPage() {
                   Votre transcription est prête !
                 </div>
                 <div style={{ fontSize: '14.5px', color: '#9ca3af', fontWeight: 500, lineHeight: 1.6, marginBottom: '26px' }}>
-                  Créez votre compte gratuit pour la lire — 60 min/mois, sans carte bancaire.
+                  Créez votre compte gratuit pour la lire — 4h de transcription par mois, sans carte bancaire.
                 </div>
                 <Link
                   to="/register"
