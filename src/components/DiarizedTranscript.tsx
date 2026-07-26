@@ -13,16 +13,17 @@ const SPEAKER_COLORS = [
   { badge: 'bg-sky-400/15 text-sky-400', dot: 'bg-sky-400', text: 'text-sky-400' },
 ]
 
-function speakerColor(speaker: string) {
-  const match = speaker.match(/(\d+)/)
-  const index = match ? parseInt(match[1], 10) : 0
-  return SPEAKER_COLORS[index % SPEAKER_COLORS.length]
-}
-
-function speakerLabel(speaker: string) {
-  const match = speaker.match(/(\d+)/)
-  const number = match ? parseInt(match[1], 10) : 0
-  return `Intervenant ${number + 1}`
+function buildSpeakerOrder(segments: TranscriptionSegment[]): Map<string, number> {
+  // Numérote chaque speaker distinct selon son ordre d'apparition réel dans la
+  // transcription (pas selon le numéro brut du label pyannote, qui ne commence
+  // pas forcément à SPEAKER_00 pour le premier/seul intervenant détecté).
+  const order = new Map<string, number>()
+  for (const segment of segments) {
+    if (!order.has(segment.speaker)) {
+      order.set(segment.speaker, order.size)
+    }
+  }
+  return order
 }
 
 function formatTimestamp(seconds: number) {
@@ -32,13 +33,16 @@ function formatTimestamp(seconds: number) {
 }
 
 export default function DiarizedTranscript({ segments }: DiarizedTranscriptProps) {
+  const speakerOrder = buildSpeakerOrder(segments)
+
   return (
     <div className="flex flex-col gap-4">
       {segments.map((segment, i) => {
-        const color = speakerColor(segment.speaker)
+        const index = speakerOrder.get(segment.speaker) ?? 0
+        const color = SPEAKER_COLORS[index % SPEAKER_COLORS.length]
         return (
           <p key={i} className="m-0">
-            <span className={`font-bold ${color.text}`}>{speakerLabel(segment.speaker)}</span>
+            <span className={`font-bold ${color.text}`}>Intervenant {index + 1}</span>
             <span className="text-gray-500"> · </span>
             <span className="text-xs text-gray-500">{formatTimestamp(segment.start)}</span>
             <br />
