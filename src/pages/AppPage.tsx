@@ -76,6 +76,15 @@ export default function AppPage() {
     navigate('/')
   }
 
+  async function handleTranscribed() {
+    try {
+      const items = await getTranscriptions()
+      setHistory(items)
+    } catch {
+      // le refetch échoue silencieusement, l'historique garde son état précédent
+    }
+  }
+
   async function handleManageSubscription() {
     try {
       const url = await createPortalSession()
@@ -219,7 +228,7 @@ export default function AppPage() {
           </p>
         </div>
         <div style={{ background: 'linear-gradient(180deg,#0b1020,#080b16)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '28px', boxShadow: '0 24px 60px rgba(0,0,0,0.5)' }}>
-          <Dictaphone onTranscribed={(t) => setHistory((prev) => [t, ...prev])} maxMinutes={maxMinutes} />
+          <Dictaphone onTranscribed={handleTranscribed} maxMinutes={maxMinutes} />
         </div>
 
         <div style={{ marginTop: '40px', marginBottom: '10px' }}>
@@ -228,7 +237,7 @@ export default function AppPage() {
           </h2>
         </div>
         <div style={{ background: 'linear-gradient(180deg,#0b1020,#080b16)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '28px', boxShadow: '0 24px 60px rgba(0,0,0,0.5)' }}>
-          <SttForm onTranscribed={(t) => setHistory((prev) => [t, ...prev])} />
+          <SttForm onTranscribed={handleTranscribed} />
         </div>
 
         {history.length > 0 && (
