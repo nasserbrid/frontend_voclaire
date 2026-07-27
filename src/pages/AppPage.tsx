@@ -165,14 +165,6 @@ export default function AppPage() {
         </div>
       )}
 
-      {/* TEMP DEBUG SENTRY — à retirer avant commit */}
-      <button
-        onClick={() => { throw new Error('Test Sentry voclaire-frontend') }}
-        style={{ position: 'fixed', bottom: 16, right: 16, zIndex: 9999, background: '#ef4444', color: '#fff', padding: '10px 16px', borderRadius: 8, border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
-      >
-        Test Sentry
-      </button>
-
       <header style={{ position: 'sticky', top: 0, zIndex: 50, backdropFilter: 'blur(12px)', background: 'rgba(3,7,18,0.72)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <div style={{ maxWidth: '1140px', margin: '0 auto', padding: '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
