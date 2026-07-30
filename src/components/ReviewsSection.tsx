@@ -32,7 +32,7 @@ export default function ReviewsSection() {
           {reviews.length} avis d'utilisateurs
         </p>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
+      <div className="grid grid-cols-1 sm:grid-cols-3" style={{ gap: '20px' }}>
         {reviews.slice(0, 6).map((review) => (
           <div
             key={review.id}
@@ -48,7 +48,7 @@ export default function ReviewsSection() {
               {review.content}
             </p>
             <div style={{ fontSize: '13px', fontWeight: 600, color: '#6b7280' }}>
-              {review.author_name}
+              {review.first_name}, {review.company}
             </div>
           </div>
         ))}

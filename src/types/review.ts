@@ -3,6 +3,7 @@ export interface ReviewOut {
   content: string
   rating: number
   plan: string
-  author_name: string
+  first_name: string
+  company: string
   created_at: string
 }

@@ -8,12 +8,12 @@ export async function getReviews(): Promise<ReviewOut[]> {
   return res.json()
 }
 
-export async function submitReview(content: string, rating: number): Promise<ReviewOut> {
+export async function submitReview(content: string, rating: number, firstName: string, company: string): Promise<ReviewOut> {
   const res = await fetch(`${BASE}/reviews`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
-    body: JSON.stringify({ content, rating }),
+    body: JSON.stringify({ content, rating, first_name: firstName, company }),
   })
   if (!res.ok) {
     const data = await res.json().catch(() => ({}))

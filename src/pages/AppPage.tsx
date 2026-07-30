@@ -30,6 +30,8 @@ export default function AppPage() {
   )
   const [reviewRating, setReviewRating] = useState(5)
   const [reviewContent, setReviewContent] = useState('')
+  const [reviewFirstName, setReviewFirstName] = useState('')
+  const [reviewCompany, setReviewCompany] = useState('')
   const [reviewSubmitting, setReviewSubmitting] = useState(false)
   const [reviewDone, setReviewDone] = useState(false)
   const [reviewError, setReviewError] = useState('')
@@ -121,13 +123,15 @@ export default function AppPage() {
   }
 
   async function handleReviewSubmit() {
-    if (reviewSubmitting || reviewContent.trim().length < 10) return
+    if (reviewSubmitting || reviewContent.trim().length < 10 || !reviewFirstName.trim() || !reviewCompany.trim()) return
     setReviewSubmitting(true)
     setReviewError('')
     try {
-      await submitReview(reviewContent.trim(), reviewRating)
+      await submitReview(reviewContent.trim(), reviewRating, reviewFirstName.trim(), reviewCompany.trim())
       setReviewDone(true)
       setReviewContent('')
+      setReviewFirstName('')
+      setReviewCompany('')
     } catch (err) {
       setReviewError(err instanceof Error ? err.message : 'Erreur lors de la soumission')
     } finally {
@@ -421,6 +425,22 @@ export default function AppPage() {
                 ))}
                 <span style={{ fontSize: '13px', color: '#6b7280', fontWeight: 500, marginLeft: '6px' }}>{reviewRating}/5</span>
               </div>
+              <div className="flex-wrap" style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+                <input
+                  type="text"
+                  value={reviewFirstName}
+                  onChange={(e) => setReviewFirstName(e.target.value)}
+                  placeholder="Prénom"
+                  style={{ flex: '1 1 160px', background: '#05070f', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', color: '#e5e7eb', fontFamily: "'Manrope', sans-serif", fontSize: '14px', padding: '10px 14px', outline: 'none', boxSizing: 'border-box' }}
+                />
+                <input
+                  type="text"
+                  value={reviewCompany}
+                  onChange={(e) => setReviewCompany(e.target.value)}
+                  placeholder="Entreprise"
+                  style={{ flex: '1 1 160px', background: '#05070f', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', color: '#e5e7eb', fontFamily: "'Manrope', sans-serif", fontSize: '14px', padding: '10px 14px', outline: 'none', boxSizing: 'border-box' }}
+                />
+              </div>
               <textarea
                 value={reviewContent}
                 onChange={(e) => setReviewContent(e.target.value)}
@@ -433,8 +453,8 @@ export default function AppPage() {
                 <span style={{ fontSize: '12px', color: '#6b7280', fontWeight: 500 }}>{reviewContent.length}/500</span>
                 <button
                   onClick={handleReviewSubmit}
-                  disabled={reviewSubmitting || reviewContent.trim().length < 10}
-                  style={{ background: reviewContent.trim().length < 10 ? 'rgba(16,185,129,0.4)' : '#10b981', color: '#fff', border: 'none', borderRadius: '10px', padding: '10px 22px', fontSize: '14px', fontFamily: "'Manrope', sans-serif", fontWeight: 700, cursor: reviewContent.trim().length < 10 || reviewSubmitting ? 'not-allowed' : 'pointer' }}
+                  disabled={reviewSubmitting || reviewContent.trim().length < 10 || !reviewFirstName.trim() || !reviewCompany.trim()}
+                  style={{ background: (reviewContent.trim().length < 10 || !reviewFirstName.trim() || !reviewCompany.trim()) ? 'rgba(16,185,129,0.4)' : '#10b981', color: '#fff', border: 'none', borderRadius: '10px', padding: '10px 22px', fontSize: '14px', fontFamily: "'Manrope', sans-serif", fontWeight: 700, cursor: (reviewContent.trim().length < 10 || !reviewFirstName.trim() || !reviewCompany.trim() || reviewSubmitting) ? 'not-allowed' : 'pointer' }}
                 >
                   {reviewSubmitting ? 'Envoi…' : "Publier l'avis"}
                 </button>
