@@ -166,7 +166,7 @@ export default function AppPage() {
       )}
 
       <header style={{ position: 'sticky', top: 0, zIndex: 50, backdropFilter: 'blur(12px)', background: 'rgba(3,7,18,0.72)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-        <div style={{ maxWidth: '1140px', margin: '0 auto', padding: '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div className="flex-wrap gap-y-3" style={{ maxWidth: '1140px', margin: '0 auto', padding: '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <div style={{ width: '30px', height: '30px', borderRadius: '9px', background: 'linear-gradient(140deg,#10b981,#34d399)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px rgba(16,185,129,0.4)' }}>
               <div style={{ width: '8px', height: '14px', background: '#fff', borderRadius: '4px' }} />
@@ -174,7 +174,7 @@ export default function AppPage() {
             <span style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: '19px', letterSpacing: '-0.02em', color: '#fff' }}>voclaire</span>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div className="flex-wrap justify-end" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{ textAlign: 'right' }}>
               <p style={{ fontSize: '14px', color: '#fff', fontWeight: 500, margin: 0 }}>{user?.email}</p>
               <p style={{ fontSize: '12px', color: '#6b7280', fontWeight: 600, margin: 0, textTransform: 'capitalize' }}>
@@ -258,8 +258,8 @@ export default function AppPage() {
                     key={t.id}
                     style={{ background: 'linear-gradient(180deg,#0b1020,#080b16)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '18px 22px' }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                      <span style={{ fontSize: '13px', fontWeight: 700, color: '#e5e7eb', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '60%' }}>
+                    <div className="flex-wrap gap-y-2" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                      <span className="max-w-full sm:max-w-[60%]" style={{ fontSize: '13px', fontWeight: 700, color: '#e5e7eb', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {t.file_name}
                       </span>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
@@ -337,7 +337,7 @@ export default function AppPage() {
 
                     {t.status === 'done' && (
                     <>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '14px' }}>
+                    <div className="flex-wrap gap-y-2" style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '14px' }}>
                       <select
                         value={selectedMode}
                         onChange={(e) => setModeMap((prev) => ({ ...prev, [t.id]: e.target.value }))}

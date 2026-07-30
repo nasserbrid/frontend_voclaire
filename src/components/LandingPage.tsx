@@ -257,14 +257,14 @@ export default function LandingPage() {
 
       {/* NAV */}
       <nav style={{ position: 'sticky', top: 0, zIndex: 50, backdropFilter: 'blur(12px)', background: 'rgba(3,7,18,0.72)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-        <div style={{ maxWidth: '1140px', margin: '0 auto', padding: '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div className="flex-wrap gap-y-3" style={{ maxWidth: '1140px', margin: '0 auto', padding: '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <div style={{ width: '30px', height: '30px', borderRadius: '9px', background: 'linear-gradient(140deg,#10b981,#34d399)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px rgba(16,185,129,0.4)' }}>
               <div style={{ width: '8px', height: '14px', background: '#fff', borderRadius: '4px' }} />
             </div>
             <span style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: '19px', letterSpacing: '-0.02em', color: '#fff' }}>voclaire</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+          <div className="flex-wrap justify-center gap-3 sm:gap-5" style={{ display: 'flex', alignItems: 'center' }}>
             <a href="#pricing" style={{ color: '#9ca3af', textDecoration: 'none', fontSize: '14.5px', fontWeight: 500 }}>Tarifs</a>
             <Link to="/login" style={{ color: '#9ca3af', textDecoration: 'none', fontSize: '14.5px', fontWeight: 500 }}>Se connecter</Link>
             <Link to="/register" style={{ background: '#10b981', color: '#fff', textDecoration: 'none', padding: '9px 18px', borderRadius: '10px', fontSize: '14.5px', fontWeight: 600, boxShadow: '0 4px 14px rgba(16,185,129,0.35)' }}>S'inscrire</Link>
@@ -274,7 +274,7 @@ export default function LandingPage() {
 
       {/* HERO */}
       <section style={{ position: 'relative', zIndex: 1, maxWidth: '880px', margin: '0 auto', padding: '96px 24px 60px', textAlign: 'center' }}>
-        <h1 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 800, fontSize: '60px', lineHeight: 1.04, letterSpacing: '-0.03em', color: '#fff', margin: '0 0 22px' }}>
+        <h1 className="text-[34px] md:text-[60px]" style={{ fontFamily: "'Sora', sans-serif", fontWeight: 800, lineHeight: 1.04, letterSpacing: '-0.03em', color: '#fff', margin: '0 0 22px' }}>
           Votre réunion Teams, Zoom ou Meet,<br />
           <span style={{ background: 'linear-gradient(120deg,#34d399,#10b981)', WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>transcrite en quelques secondes.</span>
         </h1>
@@ -292,7 +292,7 @@ export default function LandingPage() {
 
       {/* TRUST POINTS */}
       <section style={{ position: 'relative', zIndex: 1, maxWidth: '1040px', margin: '0 auto', padding: '0 24px 60px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '20px' }}>
+        <div className="grid grid-cols-1 sm:grid-cols-3" style={{ gap: '20px' }}>
           {trustPoints.map(point => (
             <div key={point.title} style={{ background: 'linear-gradient(180deg,rgba(255,255,255,0.03),transparent)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '18px', padding: '24px', textAlign: 'center' }}>
               <div style={{ fontSize: '28px', marginBottom: '12px' }}>{point.icon}</div>
@@ -547,7 +547,7 @@ export default function LandingPage() {
           <h2 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: '34px', letterSpacing: '-0.02em', color: '#fff', margin: '0 0 10px' }}>Comment ça marche</h2>
           <p style={{ color: '#9ca3af', fontSize: '16px', margin: 0, fontWeight: 500 }}>Trois étapes, zéro friction.</p>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '20px' }}>
+        <div className="grid grid-cols-1 sm:grid-cols-3" style={{ gap: '20px' }}>
           {steps.map(step => (
             <div key={step.num} style={{ background: 'linear-gradient(180deg,rgba(255,255,255,0.03),transparent)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '18px', padding: '28px 24px' }}>
               <div style={{ fontFamily: "'Sora', sans-serif", fontSize: '14px', fontWeight: 700, color: '#10b981', marginBottom: '18px' }}>{step.num}</div>
@@ -564,7 +564,7 @@ export default function LandingPage() {
           <h2 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: '34px', letterSpacing: '-0.02em', color: '#fff', margin: '0 0 10px' }}>Gratuit vs Pro</h2>
           <p style={{ color: '#9ca3af', fontSize: '16px', margin: 0, fontWeight: 500 }}>Commencez gratuitement. Passez au niveau supérieur quand vous en avez besoin.</p>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+        <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: '20px' }}>
           <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '30px' }}>
             <div style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: '20px', color: '#fff', marginBottom: '6px' }}>Free</div>
             <div style={{ fontSize: '13.5px', color: '#9ca3af', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '22px' }}>Gratuit</div>
@@ -594,7 +594,7 @@ export default function LandingPage() {
           <h2 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: '34px', letterSpacing: '-0.02em', color: '#fff', margin: '0 0 10px' }}>Tarifs simples</h2>
           <p style={{ color: '#9ca3af', fontSize: '16px', margin: 0, fontWeight: 500 }}>Sans engagement. Annulez à tout moment.</p>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', alignItems: 'stretch' }}>
+        <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: '20px', alignItems: 'stretch' }}>
           <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '22px', padding: '34px', display: 'flex', flexDirection: 'column' }}>
             <div style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: '21px', color: '#fff' }}>Free</div>
             <div style={{ margin: '18px 0 6px', display: 'flex', alignItems: 'baseline', gap: '6px' }}>
