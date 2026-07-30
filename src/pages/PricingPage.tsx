@@ -59,9 +59,7 @@ export default function PricingPage() {
       </Helmet>
       <header style={{ padding: '20px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div style={{ width: '30px', height: '30px', borderRadius: '9px', background: 'linear-gradient(140deg,#10b981,#34d399)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px rgba(16,185,129,0.4)' }}>
-            <div style={{ width: '8px', height: '14px', background: '#fff', borderRadius: '4px' }} />
-          </div>
+          <img src="/voclaire-logo-icon-wave.png" alt="voclaire" style={{ height: '30px', width: 'auto' }} />
           <span style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: '19px', letterSpacing: '-0.02em', color: '#fff' }}>voclaire</span>
         </div>
         <button

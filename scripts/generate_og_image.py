@@ -7,11 +7,11 @@ from PIL import Image, ImageDraw, ImageFont
 WIDTH, HEIGHT = 1200, 630
 BG_COLOR = "#030712"
 EMERALD = "#10b981"
-EMERALD_LIGHT = "#34d399"
 WHITE = "#ffffff"
 GRAY = "#9ca3af"
 
 OUTPUT_PATH = Path(__file__).resolve().parent.parent / "public" / "og-image.png"
+ICON_PATH = Path(__file__).resolve().parent.parent / "public" / "voclaire-logo-icon-wave.png"
 
 # Polices système Windows, avec repli sur la police par défaut Pillow si absentes.
 FONT_CANDIDATES_BOLD = [
@@ -37,39 +37,12 @@ def load_font(candidates: list[str], size: int) -> ImageFont.FreeTypeFont:
     return ImageFont.load_default(size=size)
 
 
-def draw_logo(img: Image.Image, draw: ImageDraw.ImageDraw, x: int, y: int, size: int) -> None:
-    """Carré vert arrondi avec dégradé + barre blanche verticale, identique à favicon.svg."""
-    radius = int(size * 9 / 32)
-
-    # Dégradé diagonal emerald -> emerald clair, appliqué via un calque séparé
-    # puis masqué par un rectangle arrondi.
-    gradient = Image.new("RGB", (size, size), EMERALD)
-    grad_draw = ImageDraw.Draw(gradient)
-    c1 = Image.new("RGB", (1, 1), EMERALD).getpixel((0, 0))
-    c2 = Image.new("RGB", (1, 1), EMERALD_LIGHT).getpixel((0, 0))
-    for i in range(size * 2):
-        t = i / (size * 2)
-        r = int(c1[0] + (c2[0] - c1[0]) * t)
-        g = int(c1[1] + (c2[1] - c1[1]) * t)
-        b = int(c1[2] + (c2[2] - c1[2]) * t)
-        grad_draw.line([(0, i), (i, 0)], fill=(r, g, b))
-
-    mask = Image.new("L", (size, size), 0)
-    mask_draw = ImageDraw.Draw(mask)
-    mask_draw.rounded_rectangle([0, 0, size - 1, size - 1], radius=radius, fill=255)
-
-    img.paste(gradient, (x, y), mask)
-
-    bar_w = int(size * 8 / 32)
-    bar_h = int(size * 14 / 32)
-    bar_x = x + (size - bar_w) // 2
-    bar_y = y + int(size * 9 / 32)
-    bar_radius = int(size * 4 / 32)
-    draw.rounded_rectangle(
-        [bar_x, bar_y, bar_x + bar_w, bar_y + bar_h],
-        radius=bar_radius,
-        fill=WHITE,
-    )
+def draw_logo(img: Image.Image, x: int, y: int, height: int) -> None:
+    """Colle le logo officiel (voclaire-logo-icon-wave.png, non carré), mis à l'échelle par hauteur et composité avec sa transparence."""
+    icon = Image.open(ICON_PATH).convert("RGBA")
+    width = round(icon.width * height / icon.height)
+    icon = icon.resize((width, height), Image.LANCZOS)
+    img.paste(icon, (x, y), icon)
 
 
 def main() -> None:
@@ -77,7 +50,7 @@ def main() -> None:
     draw = ImageDraw.Draw(img)
 
     # Logo coin haut-gauche
-    draw_logo(img, draw, x=64, y=64, size=64)
+    draw_logo(img, x=64, y=64, height=64)
 
     # Titre centré
     title_font = load_font(FONT_CANDIDATES_BOLD, 110)

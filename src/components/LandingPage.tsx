@@ -259,9 +259,7 @@ export default function LandingPage() {
       <nav style={{ position: 'sticky', top: 0, zIndex: 50, backdropFilter: 'blur(12px)', background: 'rgba(3,7,18,0.72)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <div className="flex-wrap gap-y-3" style={{ maxWidth: '1140px', margin: '0 auto', padding: '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{ width: '30px', height: '30px', borderRadius: '9px', background: 'linear-gradient(140deg,#10b981,#34d399)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px rgba(16,185,129,0.4)' }}>
-              <div style={{ width: '8px', height: '14px', background: '#fff', borderRadius: '4px' }} />
-            </div>
+            <img src="/voclaire-logo-icon-wave.png" alt="voclaire" style={{ height: '30px', width: 'auto' }} />
             <span style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: '19px', letterSpacing: '-0.02em', color: '#fff' }}>voclaire</span>
           </div>
           <div className="flex-wrap justify-center gap-3 sm:gap-5" style={{ display: 'flex', alignItems: 'center' }}>
@@ -685,7 +683,7 @@ export default function LandingPage() {
         <div style={{ maxWidth: '1040px', margin: '0 auto', padding: '28px 24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '9px' }}>
-              <div style={{ width: '22px', height: '22px', borderRadius: '7px', background: 'linear-gradient(140deg,#10b981,#34d399)' }} />
+              <img src="/voclaire-logo-icon-wave.png" alt="voclaire" style={{ height: '22px', width: 'auto' }} />
               <span style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, color: '#fff', fontSize: '15px' }}>voclaire</span>
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '4px 12px', fontSize: '13px', color: '#9ca3af' }}>

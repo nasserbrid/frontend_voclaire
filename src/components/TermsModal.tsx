@@ -28,9 +28,7 @@ export default function TermsModal({ onAccepted }: TermsModalProps) {
       <div style={{ background: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '20px', padding: '40px 36px', maxWidth: '480px', width: '100%', boxShadow: '0 32px 80px rgba(0,0,0,0.6)' }}>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '24px' }}>
-          <div style={{ width: '32px', height: '32px', borderRadius: '9px', background: 'linear-gradient(140deg,#10b981,#34d399)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <div style={{ width: '8px', height: '14px', background: '#fff', borderRadius: '4px' }} />
-          </div>
+          <img src="/voclaire-logo-icon-wave.png" alt="voclaire" style={{ height: '32px', width: 'auto', flexShrink: 0 }} />
           <span style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: '18px', color: '#fff' }}>voclaire</span>
         </div>
 
