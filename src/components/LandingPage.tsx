@@ -28,6 +28,7 @@ const trustPoints = [
   { icon: '🇫🇷', title: 'Données en France', body: 'Vos audios ne quittent jamais les serveurs français.' },
   { icon: '🗣️', title: 'Qui a dit quoi', body: 'Chaque prise de parole est identifiée et attribuée automatiquement.' },
   { icon: '🎙️', title: 'Réunion ou fichier', body: 'Enregistrez en direct depuis Teams, Zoom ou Google Meet, ou déposez un fichier audio existant.' },
+  { icon: '🚫', title: 'Aucun bot invité', body: 'Voclaire capture l\'audio depuis votre navigateur, personne ne rejoint votre réunion en tant que participant.' },
 ]
 
 const freeFeatures = [
@@ -290,7 +291,7 @@ export default function LandingPage() {
 
       {/* TRUST POINTS */}
       <section style={{ position: 'relative', zIndex: 1, maxWidth: '1040px', margin: '0 auto', padding: '0 24px 60px' }}>
-        <div className="grid grid-cols-1 sm:grid-cols-3" style={{ gap: '20px' }}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4" style={{ gap: '20px' }}>
           {trustPoints.map(point => (
             <div key={point.title} style={{ background: 'linear-gradient(180deg,rgba(255,255,255,0.03),transparent)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '18px', padding: '24px', textAlign: 'center' }}>
               <div style={{ fontSize: '28px', marginBottom: '12px' }}>{point.icon}</div>
