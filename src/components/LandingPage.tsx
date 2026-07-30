@@ -13,14 +13,14 @@ const faqItems = [
   { q: "Comment fonctionne la transcription d'un fichier audio ?", a: "Déposez directement un fichier audio depuis votre PC ou smartphone (MP3, MP4, M4A, WAV et autres formats courants). Voclaire transcrit le contenu et identifie automatiquement les différents interlocuteurs. L'offre Free accepte les fichiers jusqu'à 2h chacun, dans la limite de 4h par mois au total. L'offre Pro est illimitée." },
   { q: "Comment fonctionne l'identification des interlocuteurs ?", a: "Voclaire détecte automatiquement les changements de locuteur et attribue chaque prise de parole à un interlocuteur distinct. Cette fonctionnalité est incluse dans les deux offres." },
   { q: 'Quelle est la limite gratuite ?', a: "Avec l'offre Free, vous disposez de deux quotas séparés chaque mois : 4h pour vos fichiers audio et 4h pour vos enregistrements de réunion. Chaque fichier ou réunion peut durer jusqu'à 2h. Concrètement : par exemple 2 fichiers de 2h et 2 réunions de 2h, gratuitement, chaque mois. Avec l'offre Pro, tout est illimité : ni plafond par fichier/réunion, ni volume mensuel." },
-  { q: 'Puis-je transcrire une réunion de 2h ?', a: "Oui, même avec l'offre Free : 2h par réunion ou par fichier est justement la durée maximale acceptée gratuitement. Au-delà de 2h pour un seul élément, il faut passer à l'offre Pro, qui n'a aucune limite de durée." },
+  { q: 'Puis-je transcrire une réunion de 2h ?', a: "Oui, avec l'offre Free vous disposez de 4h par mois pour vos réunions et 4h par mois pour vos fichiers audio, chaque réunion ou fichier pouvant durer jusqu'à 2h. Au-delà de 4h cumulées dans le mois, il faut passer à l'offre Pro, qui n'a aucune limite de durée." },
 ]
 
 const DEMO_MAX_MINUTES = 10
 
 const steps = [
   { num: '01', title: 'Enregistrez ou déposez', body: 'Enregistrez une réunion directement depuis Google Meet, Teams ou Zoom, ou déposez un fichier MP3, WAV, M4A.' },
-  { num: '02', title: "L'IA transcrit", body: 'Le modèle Whisper convertit la parole en texte avec une grande précision, en français.' },
+  { num: '02', title: "L'IA transcrit", body: 'Le modèle IA convertit la parole en texte avec une grande précision, en français.' },
   { num: '03', title: 'Récupérez le texte', body: "Copiez, exportez en DOCX/PDF/PPTX, ou affinez avec la correction et la reformulation IA." },
 ]
 
@@ -249,7 +249,7 @@ export default function LandingPage() {
       )}
       <Helmet>
         <title>Voclaire - Transcription audio par IA</title>
-        <meta name="description" content="Transcrivez vos réunions, enregistrements et fichiers audio en texte avec Voclaire. Propulsé par Whisper. Gratuit jusqu'à 4h/mois par catégorie (fichiers et réunions). Export DOCX, PDF, PowerPoint." />
+        <meta name="description" content="Transcrivez vos réunions, enregistrements et fichiers audio en texte avec Voclaire. Gratuit jusqu'à 4h/mois par catégorie (fichiers et réunions). Export DOCX, PDF, PowerPoint." />
       </Helmet>
 
       {/* ambient glow */}

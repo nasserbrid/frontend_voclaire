@@ -34,7 +34,7 @@ export default function CguPage() {
           <ul style={{ paddingLeft: '20px', lineHeight: 1.8, margin: 0 }}>
             <li>Transcription illimitée sans quota mensuel</li>
             <li>Améliorations LLM illimitées</li>
-            <li>Modèle Whisper fine-tuné sur le français</li>
+            <li>Modèle IA calibré pour le français</li>
             <li>Export DOCX / PDF / PPTX structurés (titre, introduction, points clés, conclusion)</li>
           </ul>
         </section>

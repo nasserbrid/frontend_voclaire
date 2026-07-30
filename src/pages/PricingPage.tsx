@@ -5,15 +5,15 @@ import { useAuth } from '../context/AuthContext'
 import { createCheckout } from '../api/payments'
 
 const FEATURES_FREE = [
-  '60 min de transcription / mois',
-  '10 améliorations LLM / mois',
+  '4h de fichiers audio / mois (2h max par fichier)',
+  '4h de réunions / mois (2h max par réunion)',
   'Export DOCX (texte brut)',
 ]
 
 const FEATURES_PRO = [
   'Transcription illimitée',
   'LLM illimité (correction, reformulation, résumé)',
-  'Modèle Whisper fine-tuné français',
+  'Modèle IA calibré pour le français',
   'Export DOCX / PDF / PPTX structurés',
   'Résiliation en 1 clic',
 ]
@@ -55,7 +55,7 @@ export default function PricingPage() {
     <div style={{ background: '#030712', color: '#e5e7eb', fontFamily: "'Manrope', sans-serif", minHeight: '100vh' }}>
       <Helmet>
         <title>Tarifs Voclaire - Gratuit & Pro | Transcription audio IA</title>
-        <meta name="description" content="Découvrez les tarifs de Voclaire. Plan Free gratuit (60 min/mois) ou Pro à 9,99 €/mois pour la transcription illimitée, l'export PDF/PPTX et le modèle Whisper fine-tuné." />
+        <meta name="description" content="Découvrez les tarifs de Voclaire. Plan Free gratuit (4h/mois par catégorie) ou Pro à 9,99 €/mois pour la transcription illimitée, l'export PDF/PPTX et le modèle IA calibré pour le français." />
       </Helmet>
       <header style={{ padding: '20px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
