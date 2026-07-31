@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react'
+import posthog from 'posthog-js'
 import { getMe, logout as apiLogout } from '../api/auth'
 import type { UserOut } from '../types'
 
@@ -21,7 +22,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (hasFetched.current) return
     hasFetched.current = true
     getMe()
-      .then(setUser)
+      .then((user) => {
+        setUser(user)
+        posthog.identify(user.id, { email: user.email, plan: user.plan })
+      })
       .catch(() => setUser(null))
       .finally(() => setLoading(false))
   }, [])
