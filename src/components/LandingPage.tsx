@@ -249,8 +249,8 @@ export default function LandingPage() {
         </div>
       )}
       <Helmet>
-        <title>Voclaire - Transcription audio par IA</title>
-        <meta name="description" content="Transcrivez vos réunions, enregistrements et fichiers audio en texte avec Voclaire. Gratuit jusqu'à 4h/mois par catégorie (fichiers et réunions). Export DOCX, PDF, PowerPoint." />
+        <title>Voclaire - L'IA qui transforme vos réunions en informations exploitables</title>
+        <meta name="description" content="Voclaire transforme vos réunions Teams, Zoom et Meet en documents exploitables : transcription, résumé, analyse des échanges et extraction automatique des informations clés. Gratuit, sans carte bancaire." />
       </Helmet>
 
       {/* ambient glow */}
@@ -275,10 +275,10 @@ export default function LandingPage() {
       <section style={{ position: 'relative', zIndex: 1, maxWidth: '880px', margin: '0 auto', padding: '96px 24px 60px', textAlign: 'center' }}>
         <h1 className="text-[34px] md:text-[60px]" style={{ fontFamily: "'Sora', sans-serif", fontWeight: 800, lineHeight: 1.04, letterSpacing: '-0.03em', color: '#fff', margin: '0 0 22px' }}>
           Votre réunion Teams, Zoom ou Meet,<br />
-          <span style={{ background: 'linear-gradient(120deg,#34d399,#10b981)', WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>transcrite en quelques secondes.</span>
+          <span style={{ background: 'linear-gradient(120deg,#34d399,#10b981)', WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>transformée en compte rendu exploitable.</span>
         </h1>
         <p style={{ fontSize: '19px', lineHeight: 1.6, color: '#9ca3af', maxWidth: '560px', margin: '0 auto 38px', fontWeight: 500 }}>
-          Enregistrez votre réunion depuis le navigateur : Voclaire capture tous les participants, transcrit automatiquement et identifie qui a dit quoi. Sans compte, sans installation.
+          Transcription automatique, résumé, analyse des échanges et extraction des informations clés — générés par IA directement depuis votre navigateur. Sans compte, sans bot invité, sans installation.
         </p>
         <div style={{ display: 'flex', gap: '14px', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
           <a href="#demo" onClick={scrollToDemo} style={{ background: '#10b981', color: '#fff', textDecoration: 'none', padding: '15px 30px', borderRadius: '12px', fontSize: '16px', fontWeight: 700, boxShadow: '0 8px 28px rgba(16,185,129,0.45)', display: 'inline-flex', alignItems: 'center', gap: '9px' }}>
