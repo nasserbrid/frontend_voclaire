@@ -18,6 +18,7 @@ export default function Dictaphone({ onTranscribed, maxMinutes }: DictaphoneProp
   const [unsupportedReason] = useState(getDictaphoneUnsupportedReason)
   const [transcript, setTranscript] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
+  const [numSpeakers, setNumSpeakers] = useState('')
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const chunksRef = useRef<Blob[]>([])
@@ -125,7 +126,7 @@ export default function Dictaphone({ onTranscribed, maxMinutes }: DictaphoneProp
     setError(null)
     setTranscript(null)
     try {
-      const result = await transcribeAudio(audioFile, elapsed, 'recording')
+      const result = await transcribeAudio(audioFile, elapsed, 'recording', numSpeakers ? Number(numSpeakers) : undefined)
 
       if (result.status === 'processing') {
         stopPollRef.current = pollTranscription(result.id, (t) => {
@@ -231,6 +232,25 @@ export default function Dictaphone({ onTranscribed, maxMinutes }: DictaphoneProp
           </div>
           <div style={{ fontSize: '13px', color: '#9ca3af', fontWeight: 500, marginBottom: '18px' }}>
             {Math.round(audioFile.size / 1024)} Ko
+          </div>
+          <div style={{ marginBottom: '14px', textAlign: 'left' }}>
+            <label style={{ fontSize: '13px', color: '#9ca3af', fontWeight: 500, display: 'block', marginBottom: '6px' }}>
+              Nombre de participants (optionnel)
+            </label>
+            <select
+              value={numSpeakers}
+              onChange={(e) => setNumSpeakers(e.target.value)}
+              style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.04)', color: '#e5e7eb', fontSize: '14px', fontFamily: "'Manrope', sans-serif" }}
+            >
+              <option value="">Je ne sais pas</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8+</option>
+            </select>
           </div>
           <div style={{ display: 'flex', gap: '10px' }}>
             <button

@@ -14,6 +14,7 @@ export default function SttForm({ onTranscribed }: SttFormProps) {
   const [dragging, setDragging] = useState(false)
   const [copied, setCopied] = useState(false)
   const [meta, setMeta] = useState('')
+  const [numSpeakers, setNumSpeakers] = useState('')
 
   const stopPollRef = useRef<(() => void) | null>(null)
 
@@ -40,7 +41,7 @@ export default function SttForm({ onTranscribed }: SttFormProps) {
     setLoading(true); setError(null); setTranscript(null)
     const t0 = Date.now()
     try {
-      const result = await transcribeAudio(file)
+      const result = await transcribeAudio(file, undefined, 'file', numSpeakers ? Number(numSpeakers) : undefined)
 
       if (result.status === 'processing') {
         stopPollRef.current = pollTranscription(result.id, (t) => {
@@ -109,6 +110,27 @@ export default function SttForm({ onTranscribed }: SttFormProps) {
             : 'MP3 · WAV · M4A · OGG · FLAC · ou glissez-déposez'}
         </div>
       </label>
+
+      {/* Nombre de participants (optionnel) */}
+      <div style={{ marginTop: '14px' }}>
+        <label style={{ fontSize: '13px', color: '#9ca3af', fontWeight: 500, display: 'block', marginBottom: '6px' }}>
+          Nombre de participants (optionnel)
+        </label>
+        <select
+          value={numSpeakers}
+          onChange={(e) => setNumSpeakers(e.target.value)}
+          style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.04)', color: '#e5e7eb', fontSize: '14px', fontFamily: "'Manrope', sans-serif" }}
+        >
+          <option value="">Je ne sais pas</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+          <option value="8">8+</option>
+        </select>
+      </div>
 
       {/* Bouton */}
       <button
