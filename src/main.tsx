@@ -10,6 +10,9 @@ Sentry.init({
   dsn: import.meta.env.VITE_SENTRY_DSN,
   environment: import.meta.env.PROD ? 'production' : 'development',
   tracesSampleRate: 0, // error tracking uniquement pour l'instant, pas de tracing de perf
+  ignoreErrors: [
+    'Non-Error promise rejection captured',
+  ],
 })
 
 posthog.init(import.meta.env.VITE_POSTHOG_KEY, {
