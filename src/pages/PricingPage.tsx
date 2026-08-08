@@ -7,7 +7,10 @@ import { createCheckout } from '../api/payments'
 const FEATURES_FREE = [
   '4h de fichiers audio / mois (2h max par fichier)',
   '4h de réunions / mois (2h max par réunion)',
-  'Export DOCX (texte brut)',
+  'Identification automatique des interlocuteurs (qui a dit quoi)',
+  'Amélioration du texte par IA : 10 fois par mois (correction, reformulation, résumé)',
+  'Export WORD',
+  'Données traitées et stockées en France',
 ]
 
 const FEATURES_PRO = [
@@ -16,6 +19,15 @@ const FEATURES_PRO = [
   'Modèle IA calibré pour le français',
   'Export DOCX / PDF / PPTX structurés',
   'Résiliation en 1 clic',
+]
+
+const FAQ_ITEMS = [
+  { q: 'Où sont stockées mes données ?', a: "Vos fichiers audio et transcriptions sont hébergés sur des serveurs en France car rien n'est transmis à des services étrangers." },
+  { q: 'Comment fonctionne l\'enregistrement de réunion ?', a: "Depuis votre navigateur, cliquez sur Démarrer l'enregistrement pendant une réunion Teams, Zoom ou Google Meet. Voclaire capture l'audio de tous les participants et génère la transcription automatiquement. L'offre Free permet d'enregistrer jusqu'à 2h par réunion, dans la limite de 4h par mois au total. L'offre Pro est illimitée." },
+  { q: "Comment fonctionne la transcription d'un fichier audio ?", a: "Déposez directement un fichier audio depuis votre PC ou smartphone (MP3, MP4, M4A, WAV et autres formats courants). Voclaire transcrit le contenu et identifie automatiquement les différents interlocuteurs. L'offre Free accepte les fichiers jusqu'à 2h chacun, dans la limite de 4h par mois au total. L'offre Pro est illimitée." },
+  { q: "Comment fonctionne l'identification des interlocuteurs ?", a: "Voclaire détecte automatiquement les changements de locuteur et attribue chaque prise de parole à un interlocuteur distinct. Cette fonctionnalité est incluse dans les deux offres." },
+  { q: 'Quelle est la limite gratuite ?', a: "Avec l'offre Free, vous disposez de deux quotas séparés chaque mois : 4h pour vos fichiers audio et 4h pour vos enregistrements de réunion. Chaque fichier ou réunion peut durer jusqu'à 2h. Concrètement : par exemple 2 fichiers de 2h et 2 réunions de 2h, gratuitement, chaque mois. Avec l'offre Pro, tout est illimité : ni plafond par fichier/réunion, ni volume mensuel." },
+  { q: 'Puis-je transcrire une réunion de 2h ?', a: "Oui, avec l'offre Free vous disposez de 4h par mois pour vos réunions et 4h par mois pour vos fichiers audio, chaque réunion ou fichier pouvant durer jusqu'à 2h. Au-delà de 4h cumulées dans le mois, il faut passer à l'offre Pro, qui n'a aucune limite de durée." },
 ]
 
 function CheckIcon() {
@@ -178,6 +190,21 @@ export default function PricingPage() {
             </div>
           </div>
         </div>
+
+        {/* FAQ */}
+        <section style={{ maxWidth: '760px', margin: '80px auto 0' }}>
+          <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+            <h2 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: '30px', letterSpacing: '-0.02em', color: '#fff', margin: 0 }}>Questions fréquentes</h2>
+          </div>
+          <dl>
+            {FAQ_ITEMS.map((item, i) => (
+              <div key={item.q} style={{ padding: '22px 0', borderTop: i === 0 ? 'none' : '1px solid rgba(255,255,255,0.06)' }}>
+                <dt style={{ fontSize: '16px', fontWeight: 700, color: '#fff', margin: '0 0 8px' }}>{item.q}</dt>
+                <dd style={{ fontSize: '15px', color: '#9ca3af', margin: 0, lineHeight: 1.6 }}>{item.a}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
       </main>
     </div>
   )
