@@ -1,10 +1,10 @@
-const ML_API = import.meta.env.VITE_ML_API_URL
+const BACKEND_URL = import.meta.env.VITE_BACKEND_VOCLAIRE_URL
 
 export async function transcribeAudio(file: File): Promise<string> {
   const body = new FormData()
   body.append('file', file)
 
-  const res = await fetch(`${ML_API}/stt`, { method: 'POST', body })
+  const res = await fetch(`${BACKEND_URL}/demo/stt`, { method: 'POST', body })
 
   if (!res.ok) {
     const data = await res.json().catch(() => ({}))
