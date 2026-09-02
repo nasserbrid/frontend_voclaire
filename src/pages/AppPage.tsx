@@ -5,6 +5,7 @@ import SttForm from '../components/SttForm'
 import Dictaphone from '../components/Dictaphone'
 import TermsModal from '../components/TermsModal'
 import DiarizedTranscript from '../components/DiarizedTranscript'
+import OnboardingChat from '../components/OnboardingChat'
 import { getTranscriptions, deleteTranscription, improveTranscription, exportTranscription, downloadBlob, pollTranscription } from '../api/transcriptions'
 import { createPortalSession } from '../api/payments'
 import { submitReview } from '../api/reviews'
@@ -478,6 +479,8 @@ export default function AppPage() {
           <Link to="/cgv" style={{ color: '#6b7280', textDecoration: 'none' }}>CGV</Link>
         </div>
       </footer>
+
+      <OnboardingChat />
     </div>
   )
 }
