@@ -5,13 +5,26 @@ import type { TranscriptionOut } from '../types/transcription'
 
 interface DictaphoneProps {
   onTranscribed?: (t: TranscriptionOut) => void
-  maxMinutes: number
+  maxSeconds: number
 }
 
-export default function Dictaphone({ onTranscribed, maxMinutes }: DictaphoneProps) {
+// Débit Opus visé : largement suffisant pour de la voix (2 h ≈ 29 Mo au lieu de ≈ 115 Mo
+// avec le débit par défaut du navigateur).
+const AUDIO_BITS_PER_SECOND = 32000
+
+// L'arrêt automatique se fait STOP_MARGIN_SECONDS avant maxSeconds : la durée réelle du
+// fichier, mesurée par ffmpeg côté backend, peut dépasser le temps affiché ici (démarrage
+// du MediaRecorder, dernier morceau en cours). Sans marge, un enregistrement coupé pile
+// à la limite risquerait d'être refusé (quota_exceeded). Le libellé affiché reste maxSeconds.
+const STOP_MARGIN_SECONDS = 5
+
+export default function Dictaphone({ onTranscribed, maxSeconds }: DictaphoneProps) {
   const [recording, setRecording] = useState(false)
   const [elapsed, setElapsed] = useState(0)
   const [audioFile, setAudioFile] = useState<File | null>(null)
+  // true dès que l'enregistrement terminé a été envoyé au backend (upload + confirm réussis)
+  const [uploaded, setUploaded] = useState(false)
+  const stopAtSeconds = maxSeconds - STOP_MARGIN_SECONDS
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [micWarning, setMicWarning] = useState<string | null>(null)
@@ -23,6 +36,7 @@ export default function Dictaphone({ onTranscribed, maxMinutes }: DictaphoneProp
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const chunksRef = useRef<Blob[]>([])
   const timerRef = useRef<number | null>(null)
+  const startedAtRef = useRef<number | null>(null)
   const displayStreamRef = useRef<MediaStream | null>(null)
   const micStreamRef = useRef<MediaStream | null>(null)
   const audioContextRef = useRef<AudioContext | null>(null)
@@ -45,6 +59,28 @@ export default function Dictaphone({ onTranscribed, maxMinutes }: DictaphoneProp
     }
   }, [])
 
+  // Demande confirmation avant de fermer ou recharger l'onglet tant qu'un enregistrement
+  // est en cours, ou terminé mais pas encore envoyé (l'audio n'existe qu'en mémoire).
+  // Le cleanup retire l'écouteur à l'arrêt protégé, après l'envoi et au démontage.
+  const shouldProtectTab = recording || (audioFile !== null && !uploaded)
+  useEffect(() => {
+    if (!shouldProtectTab) return
+    function onBeforeUnload(e: BeforeUnloadEvent) {
+      e.preventDefault()
+      e.returnValue = '' // anciens navigateurs Chromium
+    }
+    window.addEventListener('beforeunload', onBeforeUnload)
+    return () => window.removeEventListener('beforeunload', onBeforeUnload)
+  }, [shouldProtectTab])
+
+  // Temps écoulé calculé depuis l'heure de départ, et non en comptant les tops du
+  // setInterval : Chrome ralentit les minuteurs d'un onglet en arrière-plan (cas
+  // habituel pendant une visio), le compteur prendrait alors du retard.
+  function getElapsedSeconds(): number {
+    if (startedAtRef.current === null) return 0
+    return Math.floor((Date.now() - startedAtRef.current) / 1000)
+  }
+
   function stopRecording() {
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
       mediaRecorderRef.current.stop()
@@ -53,7 +89,21 @@ export default function Dictaphone({ onTranscribed, maxMinutes }: DictaphoneProp
       clearInterval(timerRef.current)
       timerRef.current = null
     }
+    if (startedAtRef.current !== null) {
+      setElapsed(Math.min(getElapsedSeconds(), stopAtSeconds))
+      startedAtRef.current = null
+    }
     setRecording(false)
+  }
+
+  // Appelée par le minuteur ET à chaque morceau produit par MediaRecorder (toutes les
+  // secondes) : les événements du MediaRecorder ne sont pas ralentis comme les minuteurs,
+  // l'arrêt automatique reste donc ponctuel même onglet en arrière-plan.
+  function tick() {
+    if (startedAtRef.current === null) return
+    const seconds = getElapsedSeconds()
+    setElapsed(seconds)
+    if (seconds >= stopAtSeconds) stopRecording()
   }
 
   async function startRecording() {
@@ -90,11 +140,12 @@ export default function Dictaphone({ onTranscribed, maxMinutes }: DictaphoneProp
 
       chunksRef.current = []
       const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/ogg'
-      const mediaRecorder = new MediaRecorder(destination.stream, { mimeType })
+      const mediaRecorder = new MediaRecorder(destination.stream, { mimeType, audioBitsPerSecond: AUDIO_BITS_PER_SECOND })
       mediaRecorderRef.current = mediaRecorder
 
       mediaRecorder.ondataavailable = (e) => {
         if (e.data.size > 0) chunksRef.current.push(e.data)
+        tick()
       }
       mediaRecorder.onstop = () => {
         const blob = new Blob(chunksRef.current, { type: mimeType })
@@ -104,17 +155,14 @@ export default function Dictaphone({ onTranscribed, maxMinutes }: DictaphoneProp
       displayStream.getAudioTracks()[0].onended = () => stopRecording()
 
       mediaRecorder.start(1000)
+      startedAtRef.current = Date.now()
       setAudioFile(null)
+      setUploaded(false)
       setElapsed(0)
       setTranscript(null)
       setRecording(true)
 
-      let localElapsed = 0
-      timerRef.current = window.setInterval(() => {
-        localElapsed += 1
-        setElapsed(localElapsed)
-        if (localElapsed >= maxMinutes * 60) stopRecording()
-      }, 1000)
+      timerRef.current = window.setInterval(tick, 1000)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Impossible de démarrer l'enregistrement")
     }
@@ -126,7 +174,9 @@ export default function Dictaphone({ onTranscribed, maxMinutes }: DictaphoneProp
     setError(null)
     setTranscript(null)
     try {
+      // elapsed = durée calculée depuis l'heure de départ (figée dans stopRecording)
       const result = await transcribeAudio(audioFile, elapsed, 'recording', numSpeakers ? Number(numSpeakers) : undefined)
+      setUploaded(true)
 
       if (result.status === 'processing') {
         stopPollRef.current = pollTranscription(result.id, (t) => {
@@ -168,12 +218,19 @@ export default function Dictaphone({ onTranscribed, maxMinutes }: DictaphoneProp
   }
 
   function formatTime(seconds: number): string {
-    const m = Math.floor(seconds / 60).toString().padStart(2, '0')
+    const h = Math.floor(seconds / 3600)
+    const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0')
     const s = (seconds % 60).toString().padStart(2, '0')
-    return `${m}:${s}`
+    return h > 0 ? `${h}:${m}:${s}` : `${m}:${s}`
   }
 
-  const remaining = maxMinutes * 60 - elapsed
+  // « 2 h », « 3 h » ; repli en minutes si la limite n'est pas un nombre entier d'heures
+  function formatLimit(seconds: number): string {
+    return seconds % 3600 === 0 ? `${seconds / 3600} h` : `${Math.round(seconds / 60)} min`
+  }
+
+  // Temps restant avant l'arrêt automatique réel (marge comprise)
+  const remaining = stopAtSeconds - elapsed
 
   if (unsupportedReason) {
     return (
@@ -210,6 +267,9 @@ export default function Dictaphone({ onTranscribed, maxMinutes }: DictaphoneProp
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginBottom: '14px' }}>
             <span style={{ width: '10px', height: '10px', borderRadius: '999px', background: '#ef4444', display: 'inline-block', animation: 'vc-pulse 1.2s ease-in-out infinite' }} />
             <span style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: '26px', color: '#fff', letterSpacing: '0.02em' }}>{formatTime(elapsed)}</span>
+          </div>
+          <div style={{ fontSize: '13px', color: '#9ca3af', fontWeight: 500, marginBottom: '14px' }}>
+            Jusqu'à {formatLimit(maxSeconds)}
           </div>
           {remaining <= 120 && remaining > 0 && (
             <div style={{ fontSize: '13px', color: '#fca5a5', fontWeight: 600, marginBottom: '14px' }}>
