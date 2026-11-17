@@ -13,6 +13,13 @@ import type { TranscriptionOut } from '../types/transcription'
 
 const MAINTENANCE_MODE = false
 
+// Durée maximale d'un enregistrement de réunion (dictaphone), en secondes.
+// Free : aligné sur la limite du backend Java (FREE_MAX_ITEM_SECONDS = 7200, soit 2 h par élément).
+// Pro : le backend n'impose pas de plafond ; 3 h est la limite actuelle du dictaphone,
+// en attendant la décision sur le plafond Pro.
+const FREE_MAX_RECORDING_SECONDS = 7200
+const PRO_MAX_RECORDING_SECONDS = 10800
+
 export default function AppPage() {
   'use no memo'
   const { user, logout, refreshUser } = useAuth()
@@ -36,7 +43,7 @@ export default function AppPage() {
   const [reviewSubmitting, setReviewSubmitting] = useState(false)
   const [reviewDone, setReviewDone] = useState(false)
   const [reviewError, setReviewError] = useState('')
-  const maxMinutes = user?.plan === 'pro' ? 180 : 15
+  const maxRecordingSeconds = user?.plan === 'pro' ? PRO_MAX_RECORDING_SECONDS : FREE_MAX_RECORDING_SECONDS
 
   useEffect(() => {
     if (!toast) return
@@ -231,7 +238,7 @@ export default function AppPage() {
           </p>
         </div>
         <div style={{ background: 'linear-gradient(180deg,#0b1020,#080b16)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '28px', boxShadow: '0 24px 60px rgba(0,0,0,0.5)' }}>
-          <Dictaphone onTranscribed={handleTranscribed} maxMinutes={maxMinutes} />
+          <Dictaphone onTranscribed={handleTranscribed} maxSeconds={maxRecordingSeconds} />
         </div>
 
         <div style={{ marginTop: '40px', marginBottom: '10px' }}>
