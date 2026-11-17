@@ -65,7 +65,7 @@ async function confirmTranscription(params: ConfirmParams): Promise<Transcriptio
 
 function getAudioDurationSeconds(file: File): Promise<number> {
   // Lecture des métadonnées via un <audio> caché — léger, pas de décodage complet en
-  // mémoire (important pour les gros fichiers Pro, jusqu'à 3h).
+  // mémoire (important pour les fichiers longs : jusqu'à 2h par fichier en Free, sans plafond en Pro).
   return new Promise((resolve, reject) => {
     const audio = document.createElement('audio')
     const url = URL.createObjectURL(file)

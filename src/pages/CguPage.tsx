@@ -26,8 +26,9 @@ export default function CguPage() {
           <h2 style={h2}>2. Plans d'accès</h2>
           <p style={{ fontWeight: 600, color: '#f9fafb', margin: '0 0 6px' }}>Plan Free (0 €/mois)</p>
           <ul style={{ paddingLeft: '20px', lineHeight: 1.8, margin: '0 0 16px' }}>
-            <li>Transcription audio (fichiers jusqu'à 60 min/mois cumulés)</li>
-            <li>10 améliorations LLM/mois (correction, reformulation, résumé)</li>
+            <li>Transcription de fichiers audio : 4 h par mois cumulées, 2 h maximum par fichier</li>
+            <li>Enregistrement de réunion : 4 h par mois cumulées, 2 h maximum par enregistrement</li>
+            <li>10 post-traitements IA par mois (correction, reformulation, résumé)</li>
             <li>Export DOCX (texte brut)</li>
           </ul>
           <p style={{ fontWeight: 600, color: '#f9fafb', margin: '0 0 6px' }}>Plan Pro (9,99 €/mois ou 95,88 €/an)</p>
