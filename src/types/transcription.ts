@@ -12,6 +12,10 @@ export interface TranscriptionSegment {
   end: number
 }
 
+// Mode du dernier post-traitement qui a produit improved_text.
+// null : texte amélioré absent, ou produit avant l'ajout de ce champ côté backend.
+export type ImprovedMode = 'correction' | 'reformulation' | 'résumé'
+
 export interface TranscriptionOut {
   id: string
   status: string
@@ -20,6 +24,7 @@ export interface TranscriptionOut {
   file_size: number
   created_at: string
   improved_text?: string
+  improved_mode?: ImprovedMode | null
   structured_content?: StructuredContent
   segments?: TranscriptionSegment[]
 }

@@ -1,4 +1,4 @@
-import type { TranscriptionOut } from '../types/transcription'
+import type { ImprovedMode, TranscriptionOut } from '../types/transcription'
 
 const BASE = import.meta.env.VITE_BACKEND_VOCLAIRE_URL
 
@@ -182,20 +182,90 @@ export async function deleteTranscription(id: string): Promise<void> {
   if (!res.ok) throw new Error(`Erreur ${res.status}`)
 }
 
-export async function exportTranscription(id: string, format: 'docx' | 'pdf' | 'pptx'): Promise<Blob> {
-  const res = await fetch(`${BASE}/transcriptions/${id}/export?format=${format}`, {
+export type ExportFormat = 'docx' | 'pdf' | 'pptx'
+// raw : transcription brute ; improved : texte amélioré (correction / reformulation / résumé).
+// Absent : comportement historique (Free : DOCX brut ; Pro : exports structurés).
+export type ExportContent = 'raw' | 'improved'
+
+const IMPROVED_SUFFIX: Record<ImprovedMode, string> = {
+  correction: '-corrige',
+  reformulation: '-reformule',
+  résumé: '-resume',
+}
+
+// Lit le nom de fichier fixé par le backend dans Content-Disposition.
+// filename* (RFC 5987, UTF-8 encodé en %XX) est prioritaire sur filename.
+function parseContentDispositionFilename(header: string | null): string | null {
+  if (!header) return null
+
+  const extended = /filename\*\s*=\s*([^;]+)/i.exec(header)
+  if (extended) {
+    const raw = extended[1].trim().replace(/^"(.*)"$/, '$1')
+    const encoded = raw.includes("''") ? raw.slice(raw.indexOf("''") + 2) : raw
+    try {
+      const decoded = decodeURIComponent(encoded)
+      if (decoded) return sanitizeFilename(decoded)
+    } catch {
+      // Encodage invalide : on tente filename ci-dessous.
+    }
+  }
+
+  const plain = /(?:^|;)\s*filename\s*=\s*("([^"]*)"|[^;]+)/i.exec(header)
+  if (plain) {
+    const value = (plain[2] ?? plain[1]).trim()
+    if (value) return sanitizeFilename(value)
+  }
+
+  return null
+}
+
+// Garde uniquement le nom (jamais de chemin) pour l'attribut download.
+function sanitizeFilename(name: string): string {
+  return name.replace(/^.*[\\/]/, '')
+}
+
+// Secours si l'en-tête est absent : nom d'origine sans extension + suffixe selon le contenu.
+function fallbackExportFilename(
+  originalName: string,
+  format: ExportFormat,
+  content: ExportContent | undefined,
+  improvedMode: ImprovedMode | null | undefined
+): string {
+  const dot = originalName.lastIndexOf('.')
+  const base = (dot > 0 ? originalName.slice(0, dot) : originalName) || 'transcription'
+  const suffix = content === 'improved' ? (improvedMode ? IMPROVED_SUFFIX[improvedMode] : '-retravaille') : ''
+  return `${base}${suffix}.${format}`
+}
+
+// Unique point d'entrée des téléchargements d'export : appel API, nom du fichier, déclenchement.
+// En cas d'erreur, lève une Error portant le detail renvoyé par l'API.
+export async function downloadTranscriptionExport(
+  transcription: Pick<TranscriptionOut, 'id' | 'file_name' | 'improved_mode'>,
+  format: ExportFormat,
+  content?: ExportContent
+): Promise<void> {
+  const params = new URLSearchParams({ format })
+  if (content) params.set('content', content)
+
+  const res = await fetch(`${BASE}/transcriptions/${transcription.id}/export?${params.toString()}`, {
     credentials: 'include',
   })
 
   if (!res.ok) {
-    const data = await res.json().catch(() => ({}))
-    throw new Error((data as { detail?: string }).detail ?? `Erreur ${res.status}`)
+    const data: unknown = await res.json().catch(() => null)
+    const detail = typeof data === 'object' && data !== null && 'detail' in data ? data.detail : undefined
+    throw new Error(typeof detail === 'string' && detail ? detail : `Erreur ${res.status}`)
   }
 
-  return res.blob()
+  const blob = await res.blob()
+  const filename =
+    parseContentDispositionFilename(res.headers.get('Content-Disposition')) ??
+    fallbackExportFilename(transcription.file_name, format, content, transcription.improved_mode)
+
+  downloadBlob(blob, filename)
 }
 
-export function downloadBlob(blob: Blob, filename: string): void {
+function downloadBlob(blob: Blob, filename: string): void {
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
