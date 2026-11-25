@@ -6,7 +6,8 @@ import Dictaphone from '../components/Dictaphone'
 import TermsModal from '../components/TermsModal'
 import DiarizedTranscript from '../components/DiarizedTranscript'
 import OnboardingChat from '../components/OnboardingChat'
-import { getTranscriptions, deleteTranscription, improveTranscription, exportTranscription, downloadBlob, pollTranscription } from '../api/transcriptions'
+import { getTranscriptions, deleteTranscription, improveTranscription, downloadTranscriptionExport, pollTranscription } from '../api/transcriptions'
+import type { ExportFormat, ExportContent } from '../api/transcriptions'
 import { createPortalSession } from '../api/payments'
 import { submitReview } from '../api/reviews'
 import type { TranscriptionOut } from '../types/transcription'
@@ -147,17 +148,18 @@ export default function AppPage() {
     }
   }
 
-  async function handleDownload(id: string, format: 'docx' | 'pdf' | 'pptx', fileName: string) {
-    setDownloadingFormat((prev) => ({ ...prev, [id]: format }))
-    setErrorMap((prev) => ({ ...prev, [id]: '' }))
+  // downloadingFormat[id] vaut le contenu ('raw' | 'improved') s'il est précisé, sinon le format :
+  // chaque bouton sait ainsi s'il est celui en cours, et tous sont désactivés pendant un export.
+  async function handleDownload(t: TranscriptionOut, format: ExportFormat, content?: ExportContent) {
+    setDownloadingFormat((prev) => ({ ...prev, [t.id]: content ?? format }))
+    setErrorMap((prev) => ({ ...prev, [t.id]: '' }))
     try {
-      const blob = await exportTranscription(id, format)
-      downloadBlob(blob, `${fileName}.${format}`)
+      await downloadTranscriptionExport(t, format, content)
     } catch (err) {
       const msg = err instanceof Error ? err.message : `Erreur export ${format.toUpperCase()}`
-      setErrorMap((prev) => ({ ...prev, [id]: msg }))
+      setErrorMap((prev) => ({ ...prev, [t.id]: msg }))
     } finally {
-      setDownloadingFormat((prev) => ({ ...prev, [id]: '' }))
+      setDownloadingFormat((prev) => ({ ...prev, [t.id]: '' }))
     }
   }
 
@@ -310,7 +312,7 @@ export default function AppPage() {
                       </p>
                     )}
 
-                    {t.improved_text && (
+                    {t.improved_text && t.improved_text.trim() !== '' && (
                       <div style={{ background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.2)', borderRadius: '10px', padding: '14px', marginTop: '10px' }}>
                         <div style={{ fontSize: '11px', color: '#34d399', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '6px' }}>
                           Texte amélioré
@@ -318,6 +320,13 @@ export default function AppPage() {
                         <p style={{ fontSize: '14px', color: '#d1fae5', margin: 0, lineHeight: 1.6 }}>
                           {t.improved_text}
                         </p>
+                        <button
+                          onClick={() => handleDownload(t, 'docx', 'improved')}
+                          disabled={isDownloading}
+                          style={{ marginTop: '10px', fontSize: '12px', color: '#9ca3af', background: 'transparent', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '8px', padding: '5px 12px', cursor: isDownloading ? 'not-allowed' : 'pointer', fontFamily: "'Manrope', sans-serif", fontWeight: 500, opacity: isDownloading ? 0.5 : 1 }}
+                        >
+                          {downloadingFormat[t.id] === 'improved' ? '…' : 'Télécharger le texte amélioré (Word)'}
+                        </button>
                       </div>
                     )}
 
@@ -369,14 +378,15 @@ export default function AppPage() {
 
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '10px', flexWrap: 'wrap' }}>
                       {user?.plan === 'pro' ? (
-                        (['docx', 'pdf', 'pptx'] as const).map((format) => {
+                        <>
+                        {(['docx', 'pdf', 'pptx'] as const).map((format) => {
                           const needsStructured = format === 'pdf' || format === 'pptx'
                           const isDisabledFormat = needsStructured && !t.structured_content
                           const isFmtDownloading = downloadingFormat[t.id] === format
                           return (
                             <button
                               key={format}
-                              onClick={() => handleDownload(t.id, format, t.file_name)}
+                              onClick={() => handleDownload(t, format)}
                               disabled={isDisabledFormat || isDownloading}
                               title={isDisabledFormat ? "Générez d'abord la réunion structurée" : undefined}
                               style={{ fontSize: '12px', color: isDisabledFormat ? '#4b5563' : '#9ca3af', background: 'transparent', border: `1px solid ${isDisabledFormat ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.12)'}`, borderRadius: '8px', padding: '5px 12px', cursor: isDisabledFormat || isDownloading ? 'not-allowed' : 'pointer', fontFamily: "'Manrope', sans-serif", fontWeight: 500, opacity: isDisabledFormat ? 0.4 : 1 }}
@@ -384,10 +394,18 @@ export default function AppPage() {
                               {isFmtDownloading ? '…' : format.toUpperCase()}
                             </button>
                           )
-                        })
+                        })}
+                        <button
+                          onClick={() => handleDownload(t, 'docx', 'raw')}
+                          disabled={isDownloading}
+                          style={{ fontSize: '12px', color: '#9ca3af', background: 'transparent', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '8px', padding: '5px 12px', cursor: isDownloading ? 'not-allowed' : 'pointer', fontFamily: "'Manrope', sans-serif", fontWeight: 500, opacity: isDownloading ? 0.5 : 1 }}
+                        >
+                          {downloadingFormat[t.id] === 'raw' ? '…' : 'Transcription brute (Word)'}
+                        </button>
+                        </>
                       ) : (
                         <button
-                          onClick={() => handleDownload(t.id, 'docx', t.file_name)}
+                          onClick={() => handleDownload(t, 'docx')}
                           disabled={isDownloading}
                           style={{ fontSize: '12px', color: '#9ca3af', background: 'transparent', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '8px', padding: '5px 12px', cursor: isDownloading ? 'not-allowed' : 'pointer', fontFamily: "'Manrope', sans-serif", fontWeight: 500, opacity: isDownloading ? 0.5 : 1 }}
                         >
